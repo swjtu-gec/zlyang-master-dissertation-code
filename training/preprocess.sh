@@ -38,5 +38,11 @@ cut -f2  processed/train.annotated.src-trg > processed/train.trg
 
 #########################
 # preprocessing
-python3.5 $FAIRSEQPY/preprocess.py --source-lang src --target-lang trg --trainpref processed/train --validpref processed/dev --testpref  processed/dev --nwordssrc 30000 --nwordstgt 30000 --destdir processed/bin
+python $FAIRSEQPY/preprocess.py \
+    --source-lang src --target-lang trg \
+    --trainpref processed/train \
+    --validpref processed/dev \
+    --testpref  processed/dev \
+    --nwordssrc 30000 --nwordstgt 30000 \
+    --destdir processed/bin
 

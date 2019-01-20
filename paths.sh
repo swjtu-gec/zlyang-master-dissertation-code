@@ -4,4 +4,5 @@ MODEL_DIR=$BASE_DIR/models
 SCRIPTS_DIR=$BASE_DIR/scripts
 SOFTWARE_DIR=$BASE_DIR/software
 
-
+# replace it with your fairseq path
+FAIRSEQPY=/home/yangzl/PycharmProjects/seq2seq-gec-pytorch/fairseq

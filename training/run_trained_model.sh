@@ -29,7 +29,7 @@ elif [[ ! -e "$model_path" ]]; then
 fi
 
 
-FAIRSEQPY=$SOFTWARE_DIR/fairseq-py
+# FAIRSEQPY=$SOFTWARE_DIR/fairseq-py
 NBEST_RERANKER=$SOFTWARE_DIR/nbest-reranker
 
 
@@ -41,7 +41,11 @@ mkdir -p $output_dir
 $SCRIPTS_DIR/apply_bpe.py -c models/bpe_model/train.bpe.model < $input_file > $output_dir/input.bpe.txt
 
 # running fairseq on the test data
-CUDA_VISIBLE_DEVICES=$device python3.5 $FAIRSEQPY/generate.py --no-progress-bar --path $models --beam $beam --nbest $beam --interactive --workers $threads processed/bin < $output_dir/input.bpe.txt > $output_dir/output.bpe.nbest.txt
+CUDA_VISIBLE_DEVICES=$device python $FAIRSEQPY/interactive.py \
+    --no-progress-bar \
+    --path $models \
+    --beam $beam --nbest $beam \
+    processed/bin < $output_dir/input.bpe.txt > $output_dir/output.bpe.nbest.txt
 
 # getting best hypotheses
 cat $output_dir/output.bpe.nbest.txt | grep "^H"  | python -c "import sys; x = sys.stdin.readlines(); x = ' '.join([ x[i] for i in range(len(x)) if(i%$nbest == 0) ]); print(x)" | cut -f3 > $output_dir/output.bpe.txt

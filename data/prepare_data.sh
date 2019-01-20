@@ -16,8 +16,8 @@ source ../paths.sh
 
 DATA_DIR=$PWD
 # paths to raw data files
-NUCLE_TAR=path/to/release3.2.tar.gz
-LANG8V2=path/to/lang-8-20111007-2.0/lang-8-20111007-L1-v2.dat
+NUCLE_TAR=./release3.2.tar.gz
+LANG8V2=./lang-8-20111007-2.0/lang-8-20111007-L1-v2.dat
 
 # path to scripts directories
 M2_SCRIPTS=$DATA_DIR/scripts/m2_scripts/
