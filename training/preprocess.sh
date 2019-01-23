@@ -4,7 +4,7 @@ set -x
 
 source ../paths.sh
 
-## paths to training and development datasets
+# paths to training and development datasets
 src_ext=src
 trg_ext=trg
 train_data_prefix=$DATA_DIR/train
@@ -13,8 +13,6 @@ dev_data_m2=$DATA_DIR/dev.all.m2
 
 # path to subword nmt
 SUBWORD_NMT=$SOFTWARE_DIR/subword-nmt
-# path to Fairseq-Py
-FAIRSEQPY=$SOFTWARE_DIR/fairseq-py
 
 ######################
 # subword segmentation
@@ -30,7 +28,7 @@ cp $dev_data_m2 processed/dev.m2
 cp $dev_data_prefix.all.tok.$src_ext processed/dev.input.txt
 
 ##########################
-#  getting annotated sentence pairs only
+# getting annotated sentence pairs only
 python $SCRIPTS_DIR/get_diff.py  processed/train.all src trg > processed/train.annotated.src-trg
 cut -f1  processed/train.annotated.src-trg > processed/train.src
 cut -f2  processed/train.annotated.src-trg > processed/train.trg
