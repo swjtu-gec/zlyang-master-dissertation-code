@@ -8,7 +8,7 @@ source ../paths.sh
 SEED=1000
 DATA_BIN_DIR=processed/bin
 
-OUT_DIR=models/mlconv_elmo/model${SEED}/
+OUT_DIR=models/fconv_elmo/model${SEED}/
 mkdir -p ${OUT_DIR}
 
 CUDA_VISIBLE_DEVICES=0 python ${FAIRSEQPY}/train.py \
