@@ -57,7 +57,7 @@ cat ${output_dir}/output.bpe.nbest.txt | grep "^H"  | python -c "import sys; x =
 cat ${output_dir}/output.bpe.txt | sed 's|@@ ||g' | sed '$ d' > ${output_dir}/output.tok.txt
 
 # additionally re-rank outputs
-if [[ $# -eq 6  ]];  then
+if [[ $# -eq 6 ]]; then
     if [[ ${reranker_feats} == "eo" ]]; then
         featstring="EditOps(name='EditOps0')"
     elif [[ ${reranker_feats} == "eolm" ]]; then
