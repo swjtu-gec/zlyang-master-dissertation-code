@@ -1,5 +1,5 @@
 #!/bin/bash
-## This script used to train fconv+BPE+Emb model
+## This script used to train fconv+Emb model
 
 set -x
 set -e
