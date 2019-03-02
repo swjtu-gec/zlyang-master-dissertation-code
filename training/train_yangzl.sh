@@ -1,14 +1,23 @@
 #!/bin/bash
-## This script used to train fconv+BPE model
+## This script used to train fconv model
 
 set -x
 set -e
 
 source ../paths.sh
 
-SEED=1000
-DATA_BIN_DIR=zh-bpe-processed/bin
-OUT_DIR=models/fconv_zh_bpe/model${SEED}/
+if [[ $# != 5 ]]; then
+    echo "Usage: `basename $0` <dir to bin data> <model_name(e.g: fconv_zh_bpe)> <random seed> <max tokens> <max sentences>"
+    exit -1
+fi
+
+DATA_BIN_DIR=$1
+model_name=$2
+SEED=$3
+MAX_TOKENS=$4
+MAX_SENS=$5
+
+OUT_DIR=models/${model_name}/model${SEED}/
 mkdir -p ${OUT_DIR}
 
 CUDA_VISIBLE_DEVICES="0" python ${FAIRSEQPY}/train.py \
@@ -20,6 +29,6 @@ CUDA_VISIBLE_DEVICES="0" python ${FAIRSEQPY}/train.py \
     --dropout='0.2' --clip-norm=0.1 --lr 0.25 --min-lr 1e-4 \
     --encoder-layers '[(1024,3)] * 7' --decoder-layers '[(1024,3)] * 7' \
     --momentum 0.99 --max-epoch 100 \
-    --max-tokens 3000 --max-sentences 30 \
+    --max-tokens ${MAX_TOKENS} --max-sentences ${MAX_SENS} \
     --no-progress-bar --seed ${SEED}
 
