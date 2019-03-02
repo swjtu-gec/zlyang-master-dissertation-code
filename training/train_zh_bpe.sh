@@ -1,4 +1,5 @@
 #!/bin/bash
+## This script used to train fconv+BPE model
 
 set -x
 set -e
@@ -6,9 +7,8 @@ set -e
 source ../paths.sh
 
 SEED=1000
-DATA_BIN_DIR=zh-processed/bin
-
-OUT_DIR=models/fconv_zh/model${SEED}/
+DATA_BIN_DIR=zh-bpe-processed/bin
+OUT_DIR=models/fconv_zh_bpe/model${SEED}/
 mkdir -p ${OUT_DIR}
 
 CUDA_VISIBLE_DEVICES="0" python ${FAIRSEQPY}/train.py \
