@@ -7,20 +7,22 @@ set -x
 
 source ../paths.sh
 
-if [[ $# -ge 4 ]]; then
+if [[ $# -ge 5 ]]; then
     input_file=$1
     output_dir=$2
     device=$3
     model_path=$4
-    if [[ $# -eq 6 ]]; then
-        reranker_weights=$5
-        reranker_feats=$6
+    DATA_BIN_DIR=$5
+    if [[ $# -eq 7 ]]; then
+        reranker_weights=$6
+        reranker_feats=$7
     fi
 else
     echo "Please specify the paths to the input_file and output directory"
-    echo "Usage: `basename $0` <input_file> <output_dir> <gpu-device-num(e.g: 0)> <path to model_file/dir> [optional args: <path-to-reranker-weights> <featuers,e.g:eo,eolm]"   >&2
+    echo "Usage: `basename $0` <input_file> <output_dir> <gpu-device-num(e.g: 0)> <path to model_file/dir> <dir to bin data> [optional args: <path-to-reranker-weights> <featuers,e.g:eo,eolm]"   >&2
     exit -1
 fi
+
 if [[ -d "$model_path" ]]; then
     models=`ls ${model_path}/*pt | tr '\n' ' ' | sed "s| \([^$]\)| --path \1|g"`
     echo ${models}
@@ -47,7 +49,7 @@ CUDA_VISIBLE_DEVICES=${device} python ${FAIRSEQPY}/interactive.py \
     --no-progress-bar \
     --path ${models} \
     --beam ${beam} --nbest ${beam} \
-    processed/bin < ${output_dir}/input.bpe.txt > ${output_dir}/output.bpe.nbest.txt
+    ${DATA_BIN_DIR} < ${output_dir}/input.bpe.txt > ${output_dir}/output.bpe.nbest.txt
 beam_search_endtime=$(date +%s)
 cost=$((beam_search_endtime - beam_search_starttime))
 echo "beam search end. cost ${cost}s"
@@ -59,11 +61,14 @@ cat ${output_dir}/output.bpe.nbest.txt | grep "^H"  | python -c "import sys; x =
 cat ${output_dir}/output.bpe.txt | sed 's|@@ ||g' | sed '$ d' > ${output_dir}/output.tok.txt
 
 # additionally re-rank outputs
-if [[ $# -eq 6 ]]; then
-    if [[ ${reranker_feats} == "eo" ]]; then
+if [[ $# -eq 7 ]]; then
+    if [[ "${reranker_feats}" == "eo" ]]; then
         featstring="EditOps(name='EditOps0')"
-    elif [[ ${reranker_feats} == "eolm" ]]; then
+    elif [[ "${reranker_feats}" == "eolm" ]]; then
         featstring="EditOps(name='EditOps0'), LM('LM0', '$MODEL_DIR/lm/94Bcclm.trie', normalize=False), WordPenalty(name='WordPenalty0')"
+    else
+        echo "Unknown re-ranker features string. got ${reranker_feats}"
+        exit -3
     fi
     ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/output.bpe.nbest.txt --debpe > ${output_dir}/output.tok.nbest.reformat.txt
     ${NBEST_RERANKER}/augmenter.py -s ${input_file} -i ${output_dir}/output.tok.nbest.reformat.txt -o ${output_dir}/output.tok.nbest.reformat.augmented.txt -f "$featstring"
