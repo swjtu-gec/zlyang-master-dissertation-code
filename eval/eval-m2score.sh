@@ -5,16 +5,16 @@ set -e
 
 source ../paths.sh
 
-if [[ $# != 1 ]]; then
-    echo 'Usage: system_name'
+if [[ $# != 2 ]]; then
+    echo "Usage: `basename $0` <system_name> <gold standard>"
     exit -1
 fi
 
 SYSTEM_NAME=$1
+GOLD_EDIT=$2
 
 SYSTEM_OUT=./${SYSTEM_NAME}/output.tok.txt
 SYSTEM_OUT_RESCORED=./${SYSTEM_NAME}/output.reranked.tok.txt
-GOLD_EDIT=${DATA_DIR}/test/conll14st-test/conll14st-test.m2
 
 echo '==== use system output to evaluate model performance ===='
 eval_starttime=$(date +%s)
