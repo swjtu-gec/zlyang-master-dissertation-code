@@ -39,3 +39,15 @@ def my_getattr(obj, attr, default):
         return obj.attr
     """
     return default if not obj.__getattribute__(attr) else obj.__getattribute__(attr)
+
+
+def sen2chars(sen, is_latin=False):
+    """
+    Convert sentence to char sequence.
+    :param sen: str, like '今天天气很好'
+    :param is_latin: whether to transform whitespace to underline.
+    :return: char list, like ['今', '天', '天', '气', '很', '好']
+    """
+    if is_latin:
+        sen = sen.replace(' ', '_')
+    return [char for char in sen if not char.isspace()]
