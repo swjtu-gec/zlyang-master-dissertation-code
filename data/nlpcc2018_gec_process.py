@@ -31,9 +31,9 @@ def main(args):
         line_cnt = 0
         for line in raw_file:
             line = line.replace('\n', '').strip()
-            filed_list = list(map(str.strip, line.split('\t')))
+            filed_list = list(map(str.strip, line.split()))
             num_correct = int(filed_list[1])
-            if num_correct + 3 != len(filed_list):
+            if num_correct + 3 != len(filed_list) or num_correct == 0:
                 continue
 
             orig_sen = filed_list[2]
