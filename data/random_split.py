@@ -39,8 +39,8 @@ def main(args):
             open(dev_trg, 'w', encoding=args.encoding) as dev_trg_file:
         line_cnt = 0
         for src_line, trg_line in zip(all_src_file, all_trg_file):
-            # remove empty target sentence pairs
-            if trg_line in ['', '\n']:
+            # remove empty src or target sentence pairs
+            if src_line in ['', '\n'] or trg_line in ['', '\n']:
                 continue
             if rdm.rand() < dev_ratio:
                 dev_src_file.write(src_line)
