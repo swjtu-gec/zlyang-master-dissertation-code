@@ -7,19 +7,20 @@ set -x
 
 source ../paths.sh
 
-if [[ $# -ge 5 ]]; then
+if [[ $# -ge 6 ]]; then
     input_file=$1
     output_dir=$2
     device=$3
     model_path=$4
     DATA_BIN_DIR=$5
-    if [[ $# -eq 7 ]]; then
-        reranker_weights=$6
-        reranker_feats=$7
+    BPE_MODEL_DIR=$6
+    if [[ $# -eq 8 ]]; then
+        reranker_weights=$7
+        reranker_feats=$8
     fi
 else
     echo "Please specify the paths to the input_file and output directory"
-    echo "Usage: `basename $0` <input_file> <output_dir> <gpu-device-num(e.g: 0)> <path to model_file/dir> <dir to bin data> [optional args: <path-to-reranker-weights> <featuers,e.g:eo,eolm]"   >&2
+    echo "Usage: `basename $0` <input_file> <output_dir> <gpu-device-num(e.g: 0)> <path to model_file/dir> <dir to bin data> <dir to BPE model> [optional args: <path-to-reranker-weights> <featuers,e.g:eo,eolm]"   >&2
     exit -1
 fi
 
@@ -41,7 +42,7 @@ nbest=${beam}
 threads=12
 
 mkdir -p ${output_dir}
-${SCRIPTS_DIR}/apply_bpe.py -c models/bpe_model/train.bpe.model < ${input_file} > ${output_dir}/input.bpe.txt
+${SCRIPTS_DIR}/apply_bpe.py -c ${BPE_MODEL_DIR}/train.bpe.model < ${input_file} > ${output_dir}/input.bpe.txt
 
 beam_search_starttime=$(date +%s)
 # running fairseq on the test data
@@ -61,7 +62,7 @@ cat ${output_dir}/output.bpe.nbest.txt | grep "^H"  | python -c "import sys; x =
 cat ${output_dir}/output.bpe.txt | sed 's|@@ ||g' | sed '$ d' > ${output_dir}/output.tok.txt
 
 # additionally re-rank outputs
-if [[ $# -eq 7 ]]; then
+if [[ $# -eq 8 ]]; then
     if [[ "${reranker_feats}" == "eo" ]]; then
         featstring="EditOps(name='EditOps0')"
     elif [[ "${reranker_feats}" == "eolm" ]]; then
