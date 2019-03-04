@@ -59,6 +59,7 @@ fi
 # pre-processing
 python ${FAIRSEQPY}/preprocess.py \
     --source-lang src --target-lang trg \
+    --workers=8 \
     --trainpref ${PROCESSED_DIR}/train \
     --validpref ${PROCESSED_DIR}/dev \
     --testpref  ${PROCESSED_DIR}/dev \
