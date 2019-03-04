@@ -39,6 +39,9 @@ def main(args):
             open(dev_trg, 'w', encoding=args.encoding) as dev_trg_file:
         line_cnt = 0
         for src_line, trg_line in zip(all_src_file, all_trg_file):
+            # remove empty target sentence pairs
+            if trg_line in ['', '\n']:
+                continue
             if rdm.rand() < dev_ratio:
                 dev_src_file.write(src_line)
                 dev_trg_file.write(trg_line)
@@ -51,8 +54,10 @@ def main(args):
 
     print('=================================================')
     print(line_cnt, 'lines have been processed finally.')
-    print('train data samples count:', reader.count_lines(train_src, args.encoding))
-    print('dev data samples count:', reader.count_lines(dev_src, args.encoding))
+    print('train src data lines count:', reader.count_lines(train_src, args.encoding))
+    print('train trg data lines count:', reader.count_lines(train_trg, args.encoding))
+    print('dev src data lines count:', reader.count_lines(dev_src, args.encoding))
+    print('dev trg data lines count:', reader.count_lines(dev_trg, args.encoding))
 
 
 if __name__ == '__main__':
