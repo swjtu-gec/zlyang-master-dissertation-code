@@ -3,23 +3,31 @@
 set -x
 set -e
 
-PROCESSED_DIR=zh-processed
-mkdir -p ${PROCESSED_DIR}
-use_bpe=true
-remove_same=false
 source ../paths.sh
-NLPCC2018_DATA_DIR=${DATA_DIR}/zh-blcu-nlpcc2018
+
+if [[ $# != 8 ]]; then
+    echo "Usage: `basename $0` <dir to processed data(e.g: zh-bpe-processed-fusion)> <whether to use BPE(e.g: true)> <whether to remove same sen pairs(e.g: false)> <dir to split train and dev token-level data(e.g: zh-fusion)> <dir to BPE model(e.g: models/zh_bpe_model_fusion)> <BPE operations(e.g: 30000)> <src vocab size(e.g: 37000)> <tgt vocab size(e.g: 37000)>"
+    exit -1
+fi
+
+PROCESSED_DIR=$1
+mkdir -p ${PROCESSED_DIR}
+use_bpe=$2
+remove_same=$3
+SPLIT_TOKEN_DATA_DIR=$4
+BPE_MODEL_DIR=$5
+bpe_operations=$6
+src_vocab_size=$7
+tgt_vocab_size=$8
+
 # path to sub-word nmt
 SUBWORD_NMT=${SOFTWARE_DIR}/subword-nmt
-BPE_MODEL_DIR=models/zh_bpe_model
 BPE_MODEL=train.bpe.model
-bpe_operations=30000
-
 # paths to training and development datasets
 src_ext=src
 trg_ext=trg
-train_data_prefix=${NLPCC2018_DATA_DIR}/train.tok
-dev_data_prefix=${NLPCC2018_DATA_DIR}/dev.tok
+train_data_prefix=${SPLIT_TOKEN_DATA_DIR}/train.tok
+dev_data_prefix=${SPLIT_TOKEN_DATA_DIR}/dev.tok
 
 if [[ "${use_bpe}" == 'true' ]]; then
     # sub-word segmentation
@@ -54,6 +62,6 @@ python ${FAIRSEQPY}/preprocess.py \
     --trainpref ${PROCESSED_DIR}/train \
     --validpref ${PROCESSED_DIR}/dev \
     --testpref  ${PROCESSED_DIR}/dev \
-    --nwordssrc 37000 --nwordstgt 37000 \
+    --nwordssrc ${src_vocab_size} --nwordstgt ${tgt_vocab_size} \
     --destdir ${PROCESSED_DIR}/bin
 
