@@ -27,7 +27,7 @@ fi
 OUT_DIR=models/${model_name}/model${SEED}/
 mkdir -p ${OUT_DIR}
 
-CUDA_VISIBLE_DEVICES=${use_gpus} python ${FAIRSEQPY}/train.py \
+CUDA_VISIBLE_DEVICES="${use_gpus}" python ${FAIRSEQPY}/train.py \
     ${DATA_BIN_DIR} \
     --save-dir ${OUT_DIR} \
     -a fconv \
