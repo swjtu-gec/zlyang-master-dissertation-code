@@ -15,6 +15,7 @@ trg_ext=$3
 fusion_prefix=$4
 
 cd ${TO_CONCAT_DIR} && src_fnames=`ls | grep ${src_ext}`
+cd ${cur_path}
 for src_fname in ${src_fnames}
 do
     src_fname=${TO_CONCAT_DIR}/${src_fname}
@@ -25,7 +26,6 @@ do
     fi
 done
 
-cd ${cur_path}
 cat ${to_fusion_src} > ${fusion_prefix}.${src_ext}
 cat ${to_fusion_trg} > ${fusion_prefix}.${trg_ext}
 
