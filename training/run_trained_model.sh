@@ -46,7 +46,7 @@ ${SCRIPTS_DIR}/apply_bpe.py -c ${BPE_MODEL_DIR}/train.bpe.model < ${input_file} 
 
 beam_search_starttime=$(date +%s)
 # running fairseq on the test data
-CUDA_VISIBLE_DEVICES=${device} python ${FAIRSEQPY}/interactive.py \
+CUDA_VISIBLE_DEVICES="${device}" python ${FAIRSEQPY}/interactive.py \
     --no-progress-bar \
     --path ${models} \
     --beam ${beam} --nbest ${beam} \
