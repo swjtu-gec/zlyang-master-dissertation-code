@@ -1,6 +1,8 @@
 import os
 import sys
 
+import matplotlib.pyplot as plt
+
 
 def get_fnames_under_path(path):
     """
@@ -51,3 +53,20 @@ def sen2chars(sen, is_latin=False):
     if is_latin:
         sen = sen.replace(' ', '_')
     return [char for char in sen if not char.isspace()]
+
+
+def plot_bargraph(fig_name, to_draw_dict):
+    name_list = []
+    num_list = []
+    for i in to_draw_dict.keys():
+        name_list.append(i)
+        num_list.append(to_draw_dict[i])
+    rects = plt.bar(range(len(num_list)), num_list, color='rgby')
+    plt.ylabel('Nums')
+    index = [i for i in range(len(num_list))]
+    plt.xticks(index, name_list)
+    for rect in rects:
+        height = rect.get_height()
+        plt.text(rect.get_x()+rect.get_width()/2, height, str(height), ha='center', va='bottom')
+    plt.savefig('./' + fig_name + '.png')
+    plt.show()

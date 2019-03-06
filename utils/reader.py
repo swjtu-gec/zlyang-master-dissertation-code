@@ -37,3 +37,24 @@ def count_lines(url, open_encoding='utf-8'):
                 if line != '\n' and line != '':
                     line_count += 1
     return line_count
+
+
+def read_tokens(url, open_encoding='utf-8'):
+    """
+    Read all distinct tokens.
+    :param url:
+    :param open_encoding:
+    :return: set, {'apple', 'banana', ...}
+    """
+    ret_tokens = set()
+    if os.path.isdir(url):
+        for text in generate_text_from_corpus(url, open_encoding):
+            for line in match_newline_pattern.split(text):
+                for token in line.split():
+                    ret_tokens.add(token)
+    elif os.path.isfile(url):
+        with open(url, 'r', encoding=open_encoding) as file:
+            for line in file:
+                for token in line.split():
+                    ret_tokens.add(token)
+    return ret_tokens
