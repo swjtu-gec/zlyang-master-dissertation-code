@@ -14,15 +14,23 @@ if [[ $# -ge 6 ]]; then
     model_path=$4
     DATA_BIN_DIR=$5
     BPE_MODEL_DIR=$6
-    if [[ $# -eq 8 ]]; then
+    if [[ $# -ge 8 ]]; then
         reranker_weights=$7
         reranker_feats=$8
+        if [[ "${reranker_feats}" == "eolm" ]]; then
+            lm_url=$9
+        fi
     fi
 else
-    echo "Please specify the paths to the input_file and output directory"
-    echo "Usage: `basename $0` <input_file> <output_dir> <gpu-device-num(e.g: 0)> <path to model_file/dir> <dir to bin data> <dir to BPE model> [optional args: <path-to-reranker-weights> <featuers,e.g:eo,eolm]"   >&2
+    echo "Usage: `basename $0` <input_file> <output_dir> <GPU device id to use(e.g: '0, 1, 2')> <path to model_file/dir> <dir to bin data> <dir to BPE model> [optional args: <path-to-reranker-weights> <features, e.g: 'eo' or 'eolm'> <trained language model's url>]"
     exit -1
 fi
+
+
+NBEST_RERANKER=${SOFTWARE_DIR}/nbest-reranker
+beam=12
+nbest=${beam}
+threads=12
 
 if [[ -d "$model_path" ]]; then
     models=`ls ${model_path}/*pt | tr '\n' ' ' | sed "s| \([^$]\)| --path \1|g"`
@@ -33,13 +41,6 @@ elif [[ ! -e "$model_path" ]]; then
     echo "Model path not found: $model_path"
     exit -2
 fi
-
-
-NBEST_RERANKER=${SOFTWARE_DIR}/nbest-reranker
-
-beam=12
-nbest=${beam}
-threads=12
 
 mkdir -p ${output_dir}
 ${SCRIPTS_DIR}/apply_bpe.py -c ${BPE_MODEL_DIR}/train.bpe.model < ${input_file} > ${output_dir}/input.bpe.txt
@@ -62,17 +63,21 @@ cat ${output_dir}/output.bpe.nbest.txt | grep "^H"  | python -c "import sys; x =
 cat ${output_dir}/output.bpe.txt | sed 's|@@ ||g' | sed '$ d' > ${output_dir}/output.tok.txt
 
 # additionally re-rank outputs
-if [[ $# -eq 8 ]]; then
+if [[ $# -ge 8 ]]; then
     if [[ "${reranker_feats}" == "eo" ]]; then
         featstring="EditOps(name='EditOps0')"
     elif [[ "${reranker_feats}" == "eolm" ]]; then
-        featstring="EditOps(name='EditOps0'), LM('LM0', '$MODEL_DIR/lm/94Bcclm.trie', normalize=False), WordPenalty(name='WordPenalty0')"
+        featstring="EditOps(name='EditOps0'), LM('LM0', '$lm_url', normalize=False), WordPenalty(name='WordPenalty0')"
     else
         echo "Unknown re-ranker features string. got ${reranker_feats}"
         exit -3
     fi
+    rerank_starttime=$(date +%s)
     ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/output.bpe.nbest.txt --debpe > ${output_dir}/output.tok.nbest.reformat.txt
     ${NBEST_RERANKER}/augmenter.py -s ${input_file} -i ${output_dir}/output.tok.nbest.reformat.txt -o ${output_dir}/output.tok.nbest.reformat.augmented.txt -f "$featstring"
     ${NBEST_RERANKER}/rerank.py -i ${output_dir}/output.tok.nbest.reformat.augmented.txt -w ${reranker_weights} -o ${output_dir} --clean-up
     mv ${output_dir}/output.tok.nbest.reformat.augmented.txt.reranked.1best ${output_dir}/output.reranked.tok.txt
+    rerank_endtime=$(date +%s)
+    cost=$((rerank_endtime - rerank_starttime))
+    echo "re-rank end. cost ${cost}s"
 fi
