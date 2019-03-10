@@ -33,7 +33,10 @@ nbest=${beam}
 threads=12
 
 if [[ -d "$model_path" ]]; then
-    models=`ls ${model_path}/*pt | tr '\n' ' ' | sed "s| \([^$]\)| --path \1|g"`
+    models=`ls ${model_path}/*pt | tr '\n' ' '`
+    models=${models//pt /pt:}
+    models=${models/%:/''}
+#    models=`ls ${model_path}/*pt | tr '\n' ' ' | sed "s| \([^$]\)| --path \1|g"`
     echo ${models}
 elif [[ -f "$model_path" ]]; then
     models=${model_path}
