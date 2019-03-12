@@ -17,12 +17,16 @@ if [[ $# -ge 6 ]]; then
     if [[ $# -ge 8 ]]; then
         reranker_weights=$7
         reranker_feats=$8
-        if [[ "${reranker_feats}" == "eolm" ]]; then
+        if [[ "${reranker_feats}" == "eolm" || "${reranker_feats}" == "lm" ]]; then
             lm_url=$9
+            if [[ ! -f ${lm_url} ]]; then
+                echo "Language model not found: ${lm_url}"
+                exit -2
+            fi
         fi
     fi
 else
-    echo "Usage: `basename $0` <input_file> <output_dir> <GPU device id to use(e.g: '0, 1, 2')> <path to model_file/dir> <dir to bin data> <dir to BPE model> [optional args: <path-to-reranker-weights> <features, e.g: 'eo' or 'eolm'> <trained language model's url>]"
+    echo "Usage: `basename $0` <input_file> <output_dir> <GPU device id to use(e.g: '0, 1, 2')> <path to model_file/dir> <dir to bin data> <dir to BPE model> [optional args: <path-to-reranker-weights> <features, e.g: 'eo' or 'lm' or 'eolm'> <trained language model's url>]"
     exit -1
 fi
 
@@ -42,7 +46,7 @@ elif [[ -f "$model_path" ]]; then
     models=${model_path}
 elif [[ ! -e "$model_path" ]]; then
     echo "Model path not found: $model_path"
-    exit -2
+    exit -3
 fi
 
 mkdir -p ${output_dir}
@@ -69,17 +73,22 @@ cat ${output_dir}/output.bpe.txt | sed 's|@@ ||g' | sed '$ d' > ${output_dir}/ou
 if [[ $# -ge 8 ]]; then
     if [[ "${reranker_feats}" == "eo" ]]; then
         featstring="EditOps(name='EditOps0')"
+    elif [[ "${reranker_feats}" == "lm" ]]; then
+        featstring="LM('LM0', '$lm_url', normalize=False), WordPenalty(name='WordPenalty0')"
     elif [[ "${reranker_feats}" == "eolm" ]]; then
         featstring="EditOps(name='EditOps0'), LM('LM0', '$lm_url', normalize=False), WordPenalty(name='WordPenalty0')"
     else
         echo "Unknown re-ranker features string. got ${reranker_feats}"
-        exit -3
+        exit -4
     fi
+
     rerank_starttime=$(date +%s)
+
     ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/output.bpe.nbest.txt --debpe > ${output_dir}/output.tok.nbest.reformat.txt
     ${NBEST_RERANKER}/augmenter.py -s ${input_file} -i ${output_dir}/output.tok.nbest.reformat.txt -o ${output_dir}/output.tok.nbest.reformat.augmented.txt -f "$featstring"
     ${NBEST_RERANKER}/rerank.py -i ${output_dir}/output.tok.nbest.reformat.augmented.txt -w ${reranker_weights} -o ${output_dir} --clean-up
     mv ${output_dir}/output.tok.nbest.reformat.augmented.txt.reranked.1best ${output_dir}/output.reranked.tok.txt
+
     rerank_endtime=$(date +%s)
     cost=$((rerank_endtime - rerank_starttime))
     echo "re-rank end. cost ${cost}s"

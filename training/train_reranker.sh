@@ -16,11 +16,15 @@ if [[ $# -ge 8 ]]; then
     moses_path=$6
     DATA_BIN_DIR=$7
     BPE_MODEL_DIR=$8
-    if [[ "${reranker_feats}" == "eolm" ]]; then
+    if [[ "${reranker_feats}" == "eolm" || "${reranker_feats}" == "lm" ]]; then
         lm_url=$9
+        if [[ ! -f ${lm_url} ]]; then
+            echo "Language model not found: ${lm_url}"
+            exit -2
+        fi
     fi
 else
-    echo "Usage: `basename $0` <dir to dev data> <output_dir> <GPU device id to use(e.g: '0, 1, 2')> <path to model_file/dir> <features, e.g: 'eo' or 'eolm'> <path-to-moses> <dir to bin data> <dir to BPE model> [optional args: <trained language model's url>]"
+    echo "Usage: `basename $0` <dir to dev data> <output_dir> <GPU device id to use(e.g: '0, 1, 2')> <path to model_file/dir> <features, e.g: 'eo' or 'lm' or 'eolm'> <path-to-moses> <dir to bin data> <dir to BPE model> [optional args: <trained language model's url>]"
     exit -1
 fi
 
@@ -32,13 +36,15 @@ threads=12
 
 # setting model paths
 if [[ -d "$model_path" ]]; then
-    models=`ls ${model_path}/*.pt | tr '\n' ' ' | sed "s| \([^$]\)| --path \1|g"`
+    models=`ls ${model_path}/*pt | tr '\n' ' '`
+    models=${models//pt /pt:}
+    models=${models/%:/''}
     echo ${models}
 elif [[ -f "$model_path" ]]; then
     models=${model_path}
 elif [[ ! -e "$model_path" ]]; then
     echo "Model path not found: $model_path"
-    exit -2
+    exit -3
 fi
 
 ###############
@@ -49,19 +55,22 @@ TRAIN_DIR=${output_dir}/training/
 mkdir -p ${TRAIN_DIR}
 echo "[weight]" > ${TRAIN_DIR}/rerank_config.ini
 echo "F0= 0.5" >> ${TRAIN_DIR}/rerank_config.ini
-echo "EditOps0= 0.2 0.2 0.2" >> ${TRAIN_DIR}/rerank_config.ini
-if [[ "${reranker_feats}" == "eolm" ]]; then
+if [[ "${reranker_feats}" == "eo" ]]; then
+    echo "EditOps0= 0.2 0.2 0.2" >> ${TRAIN_DIR}/rerank_config.ini
+elif [[ "${reranker_feats}" == "eolm" ]]; then
+    echo "EditOps0= 0.2 0.2 0.2" >> ${TRAIN_DIR}/rerank_config.ini
+    echo "LM0= 0.5" >> ${TRAIN_DIR}/rerank_config.ini
+    echo "WordPenalty0= -1" >> ${TRAIN_DIR}/rerank_config.ini
+elif [[ "${reranker_feats}" == "lm" ]]; then
     echo "LM0= 0.5" >> ${TRAIN_DIR}/rerank_config.ini
     echo "WordPenalty0= -1" >> ${TRAIN_DIR}/rerank_config.ini
 fi
 
 if [[ "${reranker_feats}" == "eo" ]]; then
     featstring="EditOps(name='EditOps0')"
+elif [[ "${reranker_feats}" == "lm" ]]; then
+    featstring="LM('LM0', '$lm_url', normalize=False), WordPenalty(name='WordPenalty0')"
 elif [[ "${reranker_feats}" == "eolm" ]]; then
-    if [[ ! -f ${lm_url} ]]; then
-        echo "Language model not found: ${lm_url}"
-        exit -3
-    fi
     featstring="EditOps(name='EditOps0'), LM('LM0', '$lm_url', normalize=False), WordPenalty(name='WordPenalty0')"
 else
     echo "Unknown re-ranker features string. got ${reranker_feats}"
@@ -86,7 +95,7 @@ ${NBEST_RERANKER}/augmenter.py -s ${dev_data_dir}/dev.input.txt -i ${output_dir}
 # training the nbest to obtain the weights
 ${NBEST_RERANKER}/train.py -i ${output_dir}/dev.output.tok.nbest.reformat.augmented.txt -r ${dev_data_dir}/dev.m2 -c ${TRAIN_DIR}/rerank_config.ini --threads ${threads} --tuning-metric m2 --predictable-seed -o ${TRAIN_DIR} --moses-dir ${moses_path} --no-add-weight
 
-cp ${TRAIN_DIR}/weights.txt ${output_dir}/weights.txt
+cp ${TRAIN_DIR}/weights.txt ${output_dir}/weights.${reranker_feats}.txt
 
 train_reranker_endtime=$(date +%s)
 cost=$((train_reranker_endtime - train_reranker_starttime))
