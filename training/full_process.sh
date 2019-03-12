@@ -35,9 +35,9 @@ fi
 
 
 if [[ ! -f "${EMBED_URL}" ]]; then
-    ${train_sh} ${BIN_DATA_DIR} ${GPUs_used_training} ${model_name} ${random_seed} ${MAX_TOKENS} ${MAX_SENS}
+    ${train_sh} ${BIN_DATA_DIR} "${GPUs_used_training}" ${model_name} ${random_seed} ${MAX_TOKENS} ${MAX_SENS}
 else
-    ${train_embed_sh} ${BIN_DATA_DIR} ${GPUs_used_training} ${model_name} ${EMBED_URL} ${random_seed} ${MAX_TOKENS} ${MAX_SENS}
+    ${train_embed_sh} ${BIN_DATA_DIR} "${GPUs_used_training}" ${model_name} ${EMBED_URL} ${random_seed} ${MAX_TOKENS} ${MAX_SENS}
 fi
 
 
@@ -51,7 +51,7 @@ fi
 gec_system_out=${inference_output_dir}/output.tok.txt
 
 
-${run_trained_model_sh} ${test_input} ${inference_output_dir} ${GPUs_used_inference} ${model_path_used_inference} ${BIN_DATA_DIR} ${BPE_MODEL_DIR}
+${run_trained_model_sh} ${test_input} ${inference_output_dir} "${GPUs_used_inference}" ${model_path_used_inference} ${BIN_DATA_DIR} ${BPE_MODEL_DIR}
 
 
 ${remove_spac_pkunlp_segment_sh} ${m2scorer_url} ${gec_system_out} ${gold_edit} 'false'
