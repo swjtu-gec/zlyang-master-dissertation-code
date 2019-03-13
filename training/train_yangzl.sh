@@ -25,7 +25,7 @@ CUDA_VISIBLE_DEVICES="${use_gpus}" python ${FAIRSEQPY}/train.py \
     ${DATA_BIN_DIR} \
     --save-dir ${OUT_DIR} \
     -a fconv \
-    --fp16 --memory-efficient-fp16 \
+    --fp16 \
     --num-workers=4 --skip-invalid-size-inputs-valid-test \
     --encoder-embed-dim 500 \
     --decoder-embed-dim 500 --decoder-out-embed-dim 500 \
