@@ -49,7 +49,13 @@ def main(args):
             # remove space from nlpcc2018gec raw train data
             filed_list = list(map(lambda x: empty_pattern.sub('', x), line.split('\t')))
             filed_list = list(filter(lambda x: x, filed_list))
-            orig_sen = filed_list[2]
+            try:
+                orig_sen = filed_list[2]
+            except IndexError as error:
+                print(error.__str__())
+                print(line)
+                continue
+
             orig_segmented = segment_sen(orig_sen, args.char_level)
             orig_segmented_joined = ' '.join(orig_segmented) + '\n'
             if empty_pattern.match(orig_segmented_joined) or orig_segmented_joined in ['']:
