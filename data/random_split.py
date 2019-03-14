@@ -14,15 +14,13 @@ rdm.seed(1234)
 
 
 def main(args):
-    all_train_src = 'lang8.src'
-    all_train_trg = 'lang8.trg'
     train_src = 'train.tok.src'
     train_trg = 'train.tok.trg'
     dev_src = 'dev.tok.src'
     dev_trg = 'dev.tok.trg'
 
-    all_train_src = os.path.join(args.input_dir, all_train_src)
-    all_train_trg = os.path.join(args.input_dir, all_train_trg)
+    all_train_src = args.all_src_fname
+    all_train_trg = args.all_trg_fname
     train_src = os.path.join(args.output_dir, train_src)
     train_trg = os.path.join(args.output_dir, train_trg)
     dev_src = os.path.join(args.output_dir, dev_src)
@@ -60,17 +58,23 @@ def main(args):
     print('dev trg data lines count:', reader.count_lines(dev_trg, args.encoding))
 
 
-if __name__ == '__main__':
+def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input-dir', type=str, metavar='STR', required=True,
-                        help='dir to all src and trg data')
+    parser.add_argument('--all-src-fname', type=str, metavar='STR', required=True,
+                        help='url to train all src filename')
+    parser.add_argument('--all-trg-fname', type=str, metavar='STR', required=True,
+                        help='url to train all target filename')
     parser.add_argument('--output-dir', type=str, metavar='STR', required=True,
                         help='dir to store split train and dev data')
     parser.add_argument('--dev-samples-num', type=int, metavar='N', required=True,
                         help='the number of dev data samples')
     parser.add_argument('--encoding', type=str, metavar='STR', help='open and save encoding')
     parser.add_argument('--debug', action='store_true', help='whether to show more info for debug')
+    return parser
 
+
+if __name__ == '__main__':
+    parser = create_parser()
     args = parser.parse_args()
     args.encoding = my_getattr(args, 'encoding', 'utf-8')
     args.debug = getattr(args, 'debug', False)
