@@ -47,26 +47,24 @@ def stat_words_distribution(corpus_fname, encoding='utf-8'):
 
 
 def stat_sens_distribution(corpus_fname, encoding='utf-8'):
-    line_cnt = reader.count_lines(corpus_fname)
+    line_cnt = reader.count_lines(corpus_fname, encoding)
     print('=================== sentences distribution ========================')
     len_stat = {}
     with open(corpus_fname, 'r', encoding=encoding) as file:
         for line in file:
             sen_len = len(line.split())
+            sen_len = math.ceil(sen_len / 10) * 10
             if len_stat.get(sen_len) is not None:
                 len_stat[sen_len] += 1
             else:
                 len_stat[sen_len] = 1
-    assert line_cnt == sum(map(lambda x: x[1], list(len_stat.items())))
-    range_len_stat = {}
+    len_stat = list(len_stat.items())
+    assert line_cnt == sum(map(lambda x: x[1], len_stat))
+    len_stat.sort(key=lambda x: x[0])
+    len_stat = dict(len_stat)
     for length, cnt in len_stat.items():
-        length = math.ceil(length / 10) * 10
-        if range_len_stat.get(length) is not None:
-            range_len_stat[length] += cnt
-        else:
-            range_len_stat[length] = cnt
-    assert line_cnt == sum(map(lambda x: x[1], list(range_len_stat.items())))
-    tools.plot_bargraph('sentence length distribution', range_len_stat)
+        print(length, cnt)
+    tools.plot_bargraph('sentence length distribution', len_stat)
 
 
 def create_parser():
