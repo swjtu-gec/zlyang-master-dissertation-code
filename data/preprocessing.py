@@ -1,11 +1,19 @@
 import json
+import math
+import os
 import re
+import sys
 
 import click
 import jieba_fast as jieba
 from opencc import OpenCC
 from smart_open import smart_open
 from tqdm import tqdm
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(PROJECT_ROOT)
+
+from utils import reader
 
 jieba.initialize()
 
@@ -47,12 +55,89 @@ def segment_wiki(input_file, output_file):
                         fout.write(_wrap_func(text))
 
 
+@click.command()
+@click.option('--raw-fname', type=str, help='the raw filename')
+@click.option('--removed-fname', type=str, help='after removed filename')
+@click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
+def remove_same(raw_fname, removed_fname, encoding):
+    assert raw_fname != removed_fname, 'raw and trg filename are the same'
+    with open(raw_fname, 'r', encoding=encoding) as raw_file, \
+            open(removed_fname, 'w', encoding=encoding) as trg_file:
+        distinct = set(raw_file.read().splitlines())
+        for line in distinct:
+            trg_file.write(line + '\n')
+    print('=================================================')
+    raw_lines_cnt = reader.count_lines(raw_fname, encoding)
+    trg_lines_cnt = reader.count_lines(removed_fname, encoding)
+    print('raw filename:', raw_lines_cnt)
+    print('target filename:', trg_lines_cnt)
+    print('remove %.2f%% data' % ((raw_lines_cnt - trg_lines_cnt)/raw_lines_cnt*100))
+
+
+@click.command()
+@click.option('--src-fname', type=str, help='the source filename')
+@click.option('--trg-fname', type=str, help='the target filename')
+@click.option('--lower-bound', type=int, help='len ratio < lower_bound will be removed')
+@click.option('--upper-bound', type=int, help='len ratio > upper_bound will be removed')
+@click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
+def remove_len_ratio(src_fname, trg_fname, lower_bound, upper_bound, encoding):
+    suffix = '.remove.lenratio'
+    raw_lines_cnt = reader.count_lines(src_fname, encoding)
+    assert raw_lines_cnt == reader.count_lines(trg_fname, encoding), 'line count does not match...'
+    with open(src_fname, 'r', encoding=encoding) as src_file, \
+            open(trg_fname, 'r', encoding=encoding) as trg_file, \
+            open(src_fname+suffix, 'w', encoding=encoding) as src_remove, \
+            open(trg_fname+suffix, 'w', encoding=encoding) as trg_remove:
+        for src_line, trg_line in zip(src_file, trg_file):
+            sen_len_ratio = math.ceil(len(trg_line.split()) / len(src_line.split()) * 10)
+            if sen_len_ratio < lower_bound or sen_len_ratio > upper_bound:
+                continue
+            else:
+                src_remove.write(src_line)
+                trg_remove.write(trg_line)
+    print('=================================================')
+    remove_lines_cnt = reader.count_lines(src_fname+suffix, encoding)
+    assert remove_lines_cnt == reader.count_lines(trg_fname+suffix, encoding), 'line count does not match...'
+    print('before lines count:', raw_lines_cnt)
+    print('after remove:', remove_lines_cnt)
+    print('remove %.2f%% data' % ((raw_lines_cnt - remove_lines_cnt) / raw_lines_cnt * 100))
+
+
+@click.command()
+@click.option('--src-fname', type=str, help='the source filename')
+@click.option('--trg-fname', type=str, help='the target filename')
+@click.option('--short', type=int, help='sen pairs len < `short` will be removed')
+@click.option('--long', type=int, help='sen pairs len > `long` will be removed')
+@click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
+def remove_long_short(src_fname, trg_fname, short, long, encoding):
+    suffix = '.remove.longshort'
+    raw_lines_cnt = reader.count_lines(src_fname, encoding)
+    assert raw_lines_cnt == reader.count_lines(trg_fname, encoding), 'line count does not match...'
+    with open(src_fname, 'r', encoding=encoding) as src_file, \
+            open(trg_fname, 'r', encoding=encoding) as trg_file, \
+            open(src_fname+suffix, 'w', encoding=encoding) as src_remove, \
+            open(trg_fname+suffix, 'w', encoding=encoding) as trg_remove:
+        for src_line, trg_line in zip(src_file, trg_file):
+            if short <= len(src_line.split()) <= long and short <= len(trg_line.split()) <= long:
+                src_remove.write(src_line)
+                trg_remove.write(trg_line)
+    print('=================================================')
+    remove_lines_cnt = reader.count_lines(src_fname+suffix, encoding)
+    assert remove_lines_cnt == reader.count_lines(trg_fname+suffix, encoding), 'line count does not match...'
+    print('before lines count:', raw_lines_cnt)
+    print('after remove:', remove_lines_cnt)
+    print('remove %.2f%% data' % ((raw_lines_cnt - remove_lines_cnt) / raw_lines_cnt * 100))
+
+
 @click.group()
 def entry_point():
     pass
 
 
 entry_point.add_command(segment_wiki)
+entry_point.add_command(remove_same)
+entry_point.add_command(remove_len_ratio)
+entry_point.add_command(remove_long_short)
 
 
 if __name__ == '__main__':
