@@ -68,5 +68,5 @@ def plot_bargraph(fig_name, to_draw_dict):
     for rect in rects:
         height = rect.get_height()
         plt.text(rect.get_x()+rect.get_width()/2, height, str(height), ha='center', va='bottom')
-    plt.savefig('./' + fig_name + '.png')
+    plt.savefig('./' + '_'.join(fig_name.split()) + '.png')
     plt.show()
