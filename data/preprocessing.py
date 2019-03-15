@@ -57,30 +57,30 @@ def segment_wiki(input_file, output_file):
 
 @click.command()
 @click.option('--raw-fname', type=str, help='the raw filename')
-@click.option('--removed-fname', type=str, help='after removed filename')
+@click.option('--after-fname', type=str, help='after removed filename')
 @click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
-def remove_same(raw_fname, removed_fname, encoding):
-    assert raw_fname != removed_fname, 'raw and trg filename are the same'
+def remove_same(raw_fname, after_fname, encoding):
+    assert raw_fname != after_fname, 'raw and trg filename are the same'
     with open(raw_fname, 'r', encoding=encoding) as raw_file, \
-            open(removed_fname, 'w', encoding=encoding) as trg_file:
+            open(after_fname, 'w', encoding=encoding) as after_file:
         distinct = set(raw_file.read().splitlines())
         for line in distinct:
-            trg_file.write(line + '\n')
+            after_file.write(line + '\n')
     print('=================================================')
     raw_lines_cnt = reader.count_lines(raw_fname, encoding)
-    trg_lines_cnt = reader.count_lines(removed_fname, encoding)
+    after_lines_cnt = reader.count_lines(after_fname, encoding)
     print('raw filename:', raw_lines_cnt)
-    print('target filename:', trg_lines_cnt)
-    print('remove %.2f%% data' % ((raw_lines_cnt - trg_lines_cnt)/raw_lines_cnt*100))
+    print('after filename:', after_lines_cnt)
+    print('remove %.2f%% data' % ((raw_lines_cnt - after_lines_cnt)/raw_lines_cnt*100))
 
 
 @click.command()
 @click.option('--src-fname', type=str, help='the source filename')
 @click.option('--trg-fname', type=str, help='the target filename')
-@click.option('--lower-bound', type=int, help='len ratio < lower_bound will be removed')
-@click.option('--upper-bound', type=int, help='len ratio > upper_bound will be removed')
+@click.option('--low', type=int, help='len ratio < `low` will be removed')
+@click.option('--high', type=int, help='len ratio > `high` will be removed')
 @click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
-def remove_len_ratio(src_fname, trg_fname, lower_bound, upper_bound, encoding):
+def remove_len_ratio(src_fname, trg_fname, low, high, encoding):
     suffix = '.remove.lenratio'
     raw_lines_cnt = reader.count_lines(src_fname, encoding)
     assert raw_lines_cnt == reader.count_lines(trg_fname, encoding), 'line count does not match...'
@@ -90,17 +90,17 @@ def remove_len_ratio(src_fname, trg_fname, lower_bound, upper_bound, encoding):
             open(trg_fname+suffix, 'w', encoding=encoding) as trg_remove:
         for src_line, trg_line in zip(src_file, trg_file):
             sen_len_ratio = math.ceil(len(trg_line.split()) / len(src_line.split()) * 10)
-            if sen_len_ratio < lower_bound or sen_len_ratio > upper_bound:
+            if sen_len_ratio < low or sen_len_ratio > high:
                 continue
             else:
                 src_remove.write(src_line)
                 trg_remove.write(trg_line)
     print('=================================================')
-    remove_lines_cnt = reader.count_lines(src_fname+suffix, encoding)
-    assert remove_lines_cnt == reader.count_lines(trg_fname+suffix, encoding), 'line count does not match...'
+    after_lines_cnt = reader.count_lines(src_fname+suffix, encoding)
+    assert after_lines_cnt == reader.count_lines(trg_fname+suffix, encoding), 'line count does not match...'
     print('before lines count:', raw_lines_cnt)
-    print('after remove:', remove_lines_cnt)
-    print('remove %.2f%% data' % ((raw_lines_cnt - remove_lines_cnt) / raw_lines_cnt * 100))
+    print('after remove:', after_lines_cnt)
+    print('remove %.2f%% data' % ((raw_lines_cnt - after_lines_cnt) / raw_lines_cnt * 100))
 
 
 @click.command()
@@ -122,11 +122,11 @@ def remove_long_short(src_fname, trg_fname, short, long, encoding):
                 src_remove.write(src_line)
                 trg_remove.write(trg_line)
     print('=================================================')
-    remove_lines_cnt = reader.count_lines(src_fname+suffix, encoding)
-    assert remove_lines_cnt == reader.count_lines(trg_fname+suffix, encoding), 'line count does not match...'
+    after_lines_cnt = reader.count_lines(src_fname+suffix, encoding)
+    assert after_lines_cnt == reader.count_lines(trg_fname+suffix, encoding), 'line count does not match...'
     print('before lines count:', raw_lines_cnt)
-    print('after remove:', remove_lines_cnt)
-    print('remove %.2f%% data' % ((raw_lines_cnt - remove_lines_cnt) / raw_lines_cnt * 100))
+    print('after remove:', after_lines_cnt)
+    print('remove %.2f%% data' % ((raw_lines_cnt - after_lines_cnt) / raw_lines_cnt * 100))
 
 
 @click.group()
