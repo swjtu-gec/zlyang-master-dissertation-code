@@ -1,6 +1,3 @@
-# similarity between two files
-# len ratio
-#
 import math
 import os
 import sys
