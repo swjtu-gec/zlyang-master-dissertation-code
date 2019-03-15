@@ -23,7 +23,7 @@ from utils.tools import my_getattr
 
 # convert traditional Chinese to simplified Chinese
 CC = OpenCC('t2s')
-remove_pattern = re.compile(r'[^\u4e00-\u9fa5aA-Za-z0-9、：“”‘’（）【】[\]——.-《》·。？！，；]')
+remove_pattern = re.compile(r'[^\u4e00-\u9fa5aA-Za-z0-9、：:"“”\'‘’()（）【】[\]——.-<>《》·。?？!！,，;；]')
 empty_pattern = re.compile('\\s+')
 
 
