@@ -1,5 +1,4 @@
 import json
-import math
 import os
 import re
 import sys
@@ -77,8 +76,8 @@ def remove_same(raw_fname, after_fname, encoding):
 @click.command()
 @click.option('--src-fname', type=str, help='the source filename')
 @click.option('--trg-fname', type=str, help='the target filename')
-@click.option('--low', type=int, help='len ratio < `low` will be removed')
-@click.option('--high', type=int, help='len ratio > `high` will be removed')
+@click.option('--low', type=int, help='len ratio < `low` will be removed, e.g: 0.1')
+@click.option('--high', type=int, help='len ratio > `high` will be removed, e.g: 9')
 @click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
 def remove_len_ratio(src_fname, trg_fname, low, high, encoding):
     suffix = '.remove.lenratio'
@@ -89,7 +88,7 @@ def remove_len_ratio(src_fname, trg_fname, low, high, encoding):
             open(src_fname+suffix, 'w', encoding=encoding) as src_remove, \
             open(trg_fname+suffix, 'w', encoding=encoding) as trg_remove:
         for src_line, trg_line in zip(src_file, trg_file):
-            sen_len_ratio = math.ceil(len(trg_line.split()) / len(src_line.split()) * 10)
+            sen_len_ratio = len(trg_line.split()) / len(src_line.split())
             if sen_len_ratio < low or sen_len_ratio > high:
                 continue
             else:
