@@ -14,8 +14,6 @@ sys.path.append(PROJECT_ROOT)
 
 from utils import reader
 
-jieba.initialize()
-
 # convert traditional Chinese to simplified Chinese
 CC = OpenCC('t2s')
 # remove non Chinese char and so on.
