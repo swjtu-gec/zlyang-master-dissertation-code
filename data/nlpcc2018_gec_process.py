@@ -27,12 +27,15 @@ remove_pattern = re.compile(r'[^\u4e00-\u9fa5aA-Za-z0-9、：:"“”\'‘’()�
 empty_pattern = re.compile('\\s+')
 
 
-def segment_sen(sen, char_level):
+def segment_sen(sen, char_level, noHMM):
     sen = CC.convert(remove_pattern.sub(' ', sen))
     if char_level:
         segmented = tools.sen2chars(sen)
     else:
-        segmented = jieba.lcut(sen)
+        if noHMM:
+            segmented = jieba.lcut(sen, HMM=False)
+        else:
+            segmented = jieba.lcut(sen)
     return list(filter(lambda x: x.strip(), segmented))
 
 
@@ -56,7 +59,7 @@ def main(args):
                 print(line)
                 continue
 
-            orig_segmented = segment_sen(orig_sen, args.char_level)
+            orig_segmented = segment_sen(orig_sen, args.char_level, args.noHMM)
             orig_segmented_joined = ' '.join(orig_segmented) + '\n'
             if empty_pattern.match(orig_segmented_joined) or orig_segmented_joined in ['']:
                 continue
@@ -74,7 +77,7 @@ def main(args):
                             src_file.write(orig_segmented_joined)
                             trg_file.write(orig_segmented_joined)
                         else:
-                            tgt_segmented = segment_sen(tgt_sen, args.char_level)
+                            tgt_segmented = segment_sen(tgt_sen, args.char_level, args.noHMM)
                             tgt_segmented_joined = ' '.join(tgt_segmented) + '\n'
                             if empty_pattern.match(tgt_segmented_joined) or tgt_segmented_joined in ['']:
                                 continue
@@ -105,6 +108,7 @@ def create_parser():
     parser.add_argument('--train-all-trg', type=str, metavar='STR', required=True,
                         help='url to train all trg data')
     parser.add_argument('--char-level', action='store_true', help='whether to cut sentence in char level')
+    parser.add_argument('--noHMM', action='store_true', help='whether to cut sentence without HMM')
     parser.add_argument('--encoding', type=str, metavar='STR', help='open and save encoding')
     parser.add_argument('--debug', action='store_true', help='whether to show more info for debug')
     return parser
@@ -114,6 +118,7 @@ if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()
     args.char_level = getattr(args, 'char_level', False)
+    args.noHMM = getattr(args, 'noHMM', False)
     args.encoding = my_getattr(args, 'encoding', 'utf-8')
     args.debug = getattr(args, 'debug', False)
 
