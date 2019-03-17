@@ -14,8 +14,9 @@ from utils import tools
 @click.command()
 @click.option('--first-file', type=str, help='the first file to compare')
 @click.option('--second-file', type=str, help='the second file to compare')
+@click.option('--show-diff', type=bool, help='whether to show diff sens')
 @click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
-def sim_two_files(first_file, second_file, encoding):
+def sim_two_files(first_file, second_file, show_diff, encoding):
     fir_lines_cnt = reader.count_lines(first_file, encoding)
     sec_lines_cnt = reader.count_lines(second_file, encoding)
     same_count = 0
@@ -25,6 +26,8 @@ def sim_two_files(first_file, second_file, encoding):
         for fir_line in tqdm(first):
             if fir_line.replace('\n', '') in sec_lines:
                 same_count += 1
+            elif show_diff:
+                print(fir_line)
     print('similarity:', str(same_count / fir_lines_cnt), '|', str(same_count / sec_lines_cnt))
 
 
