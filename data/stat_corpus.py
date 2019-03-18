@@ -68,7 +68,7 @@ def stat_sens_distribution(corpus_fname, short, long, encoding='utf-8'):
     len_stat.sort(key=lambda x: x[0])
     len_stat = dict(len_stat)
     for length, cnt in len_stat.items():
-        print(length, cnt)
+        print('['+str(length-9)+', '+str(length)+']:', cnt)
     tools.plot_bargraph('sentence length distribution', len_stat)
 
 
