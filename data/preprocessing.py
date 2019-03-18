@@ -74,8 +74,8 @@ def remove_same(raw_fname, after_fname, encoding):
 @click.command()
 @click.option('--src-fname', type=str, help='the source filename')
 @click.option('--trg-fname', type=str, help='the target filename')
-@click.option('--low', type=int, help='len ratio < `low` will be removed, e.g: 0.1')
-@click.option('--high', type=int, help='len ratio > `high` will be removed, e.g: 9')
+@click.option('--low', type=float, help='len ratio < `low` will be removed, e.g: 0.1')
+@click.option('--high', type=float, help='len ratio > `high` will be removed, e.g: 9')
 @click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
 def remove_len_ratio(src_fname, trg_fname, low, high, encoding):
     suffix = '.remove.lenratio'
