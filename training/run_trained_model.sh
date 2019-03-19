@@ -50,7 +50,12 @@ elif [[ ! -e "$model_path" ]]; then
 fi
 
 mkdir -p ${output_dir}
-${SCRIPTS_DIR}/apply_bpe.py -c ${BPE_MODEL_DIR}/train.bpe.model < ${input_file} > ${output_dir}/input.bpe.txt
+if [[ -d "$BPE_MODEL_DIR" ]]; then
+    ${SCRIPTS_DIR}/apply_bpe.py -c ${BPE_MODEL_DIR}/train.bpe.model < ${input_file} > ${output_dir}/input.bpe.txt
+    beam_search_input=${output_dir}/input.bpe.txt
+else
+    beam_search_input=${input_file}
+fi
 
 beam_search_starttime=$(date +%s)
 # running fairseq on the test data
@@ -58,16 +63,20 @@ CUDA_VISIBLE_DEVICES="${device}" python ${FAIRSEQPY}/interactive.py \
     --no-progress-bar \
     --path ${models} \
     --beam ${beam} --nbest ${beam} \
-    ${DATA_BIN_DIR} < ${output_dir}/input.bpe.txt > ${output_dir}/output.bpe.nbest.txt
+    ${DATA_BIN_DIR} < ${beam_search_input} > ${output_dir}/beamsearch.output.nbest.txt
 beam_search_endtime=$(date +%s)
 cost=$((beam_search_endtime - beam_search_starttime))
 echo "beam search end. cost ${cost}s"
 
 # getting best hypotheses
-cat ${output_dir}/output.bpe.nbest.txt | grep "^H"  | python -c "import sys; x = sys.stdin.readlines(); x = ' '.join([ x[i] for i in range(len(x)) if(i%$nbest == 0) ]); print(x)" | cut -f3 > ${output_dir}/output.bpe.txt
+cat ${output_dir}/beamsearch.output.nbest.txt | grep "^H"  | python -c "import sys; x = sys.stdin.readlines(); x = ' '.join([ x[i] for i in range(len(x)) if(i%$nbest == 0) ]); print(x)" | cut -f3 > ${output_dir}/beamsearch.output.txt
 
-# debpe
-cat ${output_dir}/output.bpe.txt | sed 's|@@ ||g' | sed '$ d' > ${output_dir}/output.tok.txt
+if [[ -d "$BPE_MODEL_DIR" ]]; then
+    # debpe
+    cat ${output_dir}/beamsearch.output.txt | sed 's|@@ ||g' | sed '$ d' > ${output_dir}/output.tok.txt
+else
+    less ${output_dir}/beamsearch.output.txt > ${output_dir}/output.tok.txt
+fi
 
 # additionally re-rank outputs
 if [[ $# -ge 8 ]]; then
@@ -84,7 +93,11 @@ if [[ $# -ge 8 ]]; then
 
     rerank_starttime=$(date +%s)
 
-    ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/output.bpe.nbest.txt --debpe > ${output_dir}/output.tok.nbest.reformat.txt
+    if [[ -d "$BPE_MODEL_DIR" ]]; then
+        ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/beamsearch.output.nbest.txt --debpe > ${output_dir}/output.tok.nbest.reformat.txt
+    else
+        ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/beamsearch.output.nbest.txt > ${output_dir}/output.tok.nbest.reformat.txt
+    fi
     ${NBEST_RERANKER}/augmenter.py -s ${input_file} -i ${output_dir}/output.tok.nbest.reformat.txt -o ${output_dir}/output.tok.nbest.reformat.augmented.txt -f "$featstring"
     ${NBEST_RERANKER}/rerank.py -i ${output_dir}/output.tok.nbest.reformat.augmented.txt -w ${reranker_weights} -o ${output_dir} --clean-up
     mv ${output_dir}/output.tok.nbest.reformat.augmented.txt.reranked.1best ${output_dir}/output.reranked.tok.txt
