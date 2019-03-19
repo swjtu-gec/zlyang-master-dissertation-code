@@ -116,21 +116,24 @@ else
         None -1 ${src_vocab_size} ${trg_vocab_size}
 fi
 
-tmp_model_name=${processed_dir##*/}
+model_name=${processed_dir##*/}
+model_name=${model_name//processed-/''}
+model_name=${model_name//-/_}
+model_name=fconv_${model_name}
 if [[ "${model_level}" == 'bpe' ]]; then
     ${full_process_sh} ${processed_dir}/bin ${BPE_MODEL_DIR} \
         ${EMBED_URL} ${jieba_seg_test_input} ${gold_edit} ${m2scorer_url} \
-        ${GPUs_used_training} ${GPUs_used_inference} fconv_${tmp_model_name//-/_} \
+        ${GPUs_used_training} ${GPUs_used_inference} ${model_name} \
         ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble}
 elif [[ "${model_level}" == 'word' ]]; then
     ${full_process_sh} ${processed_dir}/bin None \
         ${EMBED_URL} ${jieba_seg_test_input} ${gold_edit} ${m2scorer_url} \
-        ${GPUs_used_training} ${GPUs_used_inference} fconv_${tmp_model_name//-/_} \
+        ${GPUs_used_training} ${GPUs_used_inference} ${model_name}  \
         ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble}
 else
     ${full_process_sh} ${processed_dir}/bin None \
         ${EMBED_URL} ${char_seg_test_input} ${gold_edit} ${m2scorer_url} \
-        ${GPUs_used_training} ${GPUs_used_inference} fconv_${tmp_model_name//-/_} \
+        ${GPUs_used_training} ${GPUs_used_inference} ${model_name}  \
         ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble}
 fi
 
