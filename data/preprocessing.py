@@ -66,8 +66,8 @@ def remove_same(raw_fname, after_fname, encoding):
     print('=================================================')
     raw_lines_cnt = reader.count_lines(raw_fname, encoding)
     after_lines_cnt = reader.count_lines(after_fname, encoding)
-    print('raw filename:', raw_lines_cnt)
-    print('after filename:', after_lines_cnt)
+    print('before lines count:', raw_lines_cnt)
+    print('after remove:', after_lines_cnt)
     print('remove %.2f%% data' % ((raw_lines_cnt - after_lines_cnt)/raw_lines_cnt*100))
 
 
