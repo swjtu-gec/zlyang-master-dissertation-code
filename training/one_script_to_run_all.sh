@@ -13,6 +13,7 @@ nlpcc2018_gec_process_py=${BASE_DIR}/data/nlpcc2018_gec_process.py
 seg_test_input_py=${BASE_DIR}/data/seg_test_input.py
 random_split_py=${BASE_DIR}/data/random_split.py
 preprocess_yangzl_sh=${BASE_DIR}/training/preprocess_yangzl.sh
+convert_parallel_to_m2_sh=${BASE_DIR}/data/convert_parallel_to_m2.sh
 full_process_sh=${BASE_DIR}/training/full_process.sh
 
 raw_train_data=${BASE_DIR}/data/nlpcc-2018-traindata/data.train
@@ -28,6 +29,7 @@ jieba_seg_test_input=${BASE_DIR}/data/test/nlpcc2018-test/jieba.seg.txt
 char_seg_test_input=${BASE_DIR}/data/test/nlpcc2018-test/char.seg.txt
 gold_edit=${BASE_DIR}/data/test/nlpcc2018-test/gold.01
 m2scorer_url=${BASE_DIR}/eval/m2scorer/scripts/m2scorer.py
+edit_creator_sh=${BASE_DIR}/software/m2scorer/scripts/edit_creator.py
 
 
 if [[ $# -eq 14 ]]; then
@@ -119,6 +121,10 @@ else
         None -1 ${src_vocab_size} ${trg_vocab_size}
 fi
 
+${convert_parallel_to_m2_sh} ${edit_creator_sh} ${processed_dir} \
+    `dirname ${nlpcc_betterseg_src}`/dev.tok.src \
+    `dirname ${nlpcc_betterseg_src}`/dev.tok.trg
+
 model_name=${processed_dir##*/}
 model_name=${model_name//processed-/''}
 model_name=${model_name//-/_}
@@ -127,16 +133,16 @@ if [[ "${model_level}" == 'bpe' ]]; then
     ${full_process_sh} ${processed_dir}/bin ${BPE_MODEL_DIR} \
         ${EMBED_URL} ${jieba_seg_test_input} ${gold_edit} ${m2scorer_url} \
         ${GPUs_used_training} ${GPUs_used_inference} ${model_name} \
-        ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble}
+        ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble} ${processed_dir}
 elif [[ "${model_level}" == 'word' ]]; then
     ${full_process_sh} ${processed_dir}/bin None \
         ${EMBED_URL} ${jieba_seg_test_input} ${gold_edit} ${m2scorer_url} \
         ${GPUs_used_training} ${GPUs_used_inference} ${model_name}  \
-        ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble}
+        ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble} ${processed_dir}
 else
     ${full_process_sh} ${processed_dir}/bin None \
         ${EMBED_URL} ${char_seg_test_input} ${gold_edit} ${m2scorer_url} \
         ${GPUs_used_training} ${GPUs_used_inference} ${model_name}  \
-        ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble}
+        ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble} ${processed_dir}
 fi
 
