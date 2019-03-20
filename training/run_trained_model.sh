@@ -75,7 +75,7 @@ if [[ -d "$BPE_MODEL_DIR" ]]; then
     # debpe
     cat ${output_dir}/beamsearch.output.txt | sed 's|@@ ||g' | sed '$ d' > ${output_dir}/output.tok.txt
 else
-    less ${output_dir}/beamsearch.output.txt > ${output_dir}/output.tok.txt
+    cat ${output_dir}/beamsearch.output.txt | sed '$d' > ${output_dir}/output.tok.txt
 fi
 
 # additionally re-rank outputs
