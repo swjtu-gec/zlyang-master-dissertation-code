@@ -30,7 +30,7 @@ gold_edit=${BASE_DIR}/data/test/nlpcc2018-test/gold.01
 m2scorer_url=${BASE_DIR}/eval/m2scorer/scripts/m2scorer.py
 
 
-if [[ $# -eq 13 ]]; then
+if [[ $# -eq 14 ]]; then
     model_level=$1
     remove_low=$2
     remove_high=$3
@@ -44,8 +44,9 @@ if [[ $# -eq 13 ]]; then
     MAX_SENS=${11}
     random_seed=${12}
     want_ensemble=${13}
+    force_redo_remove_same=${14}
 else
-    echo "Usage: `basename $0` <model level, e.g: bpe, char, word> <low, e.g: 0.1> <high, e.g: 9> <short, e.g: 1> <long, e.g: 100> <src_vocab_size> <trg_vocab_size> <GPU device id to use in training(e.g: '0, 1, 2')> <GPU device id used in test)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: true or false)>"
+    echo "Usage: `basename $0` <model level, e.g: bpe, char, word> <low, e.g: 0.1> <high, e.g: 9> <short, e.g: 1> <long, e.g: 100> <src_vocab_size> <trg_vocab_size> <GPU device id to use in training(e.g: '0, 1, 2')> <GPU device id used in test)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: true or false)> <whether to force redo remove same(e.g: false)>"
     exit -1
 fi
 
@@ -60,10 +61,12 @@ else
     EMBED_URL=None_nothing_null
 fi
 
-python ${preprocessing_py} remove-same \
-    --raw-fname=${raw_train_data} \
-    --after-fname=${train_data_remove_same} \
-    --encoding=${encoding}
+if [[ ! -f ${train_data_remove_same} || "$force_redo_remove_same" == true ]]; then
+    python ${preprocessing_py} remove-same \
+        --raw-fname=${raw_train_data} \
+        --after-fname=${train_data_remove_same} \
+        --encoding=${encoding}
+fi
 
 if [[ "${model_level}" == 'char' ]]; then
     python ${nlpcc2018_gec_process_py} \
