@@ -38,15 +38,15 @@ if [[ $# -eq 14 ]]; then
     long=$5
     src_vocab_size=$6
     trg_vocab_size=$7
-    GPUs_used_training=$8
-    GPUs_used_inference=$9
+    GPU_used_training=$8
+    GPU_used_inference=$9
     MAX_TOKENS=${10}
     MAX_SENS=${11}
     random_seed=${12}
     want_ensemble=${13}
     force_redo_remove_same_and_seg=${14}
 else
-    echo "Usage: `basename $0` <model level, e.g: bpe, char, word> <low, e.g: 0.1> <high, e.g: 9> <short, e.g: 1> <long, e.g: 100> <src_vocab_size> <trg_vocab_size> <GPU device id to use in training(e.g: '0, 1, 2')> <GPU device id used in test)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: true or false)> <whether to force redo remove same and segmentation(e.g: false)>"
+    echo "Usage: `basename $0` <model level, e.g: bpe, char, word> <low, e.g: 0.1> <high, e.g: 9> <short, e.g: 1> <long, e.g: 100> <src_vocab_size> <trg_vocab_size> <GPU device id to use in training(e.g: 0)> <GPU device id used in test)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: true or false)> <whether to force redo remove same and segmentation(e.g: false)>"
     exit -1
 fi
 
@@ -139,17 +139,17 @@ model_name=fconv_${model_name}
 if [[ "${model_level}" == 'bpe' ]]; then
     ${full_process_sh} ${processed_dir}/bin ${BPE_MODEL_DIR} \
         ${EMBED_URL} ${jieba_seg_test_input} ${gold_edit} ${m2scorer_url} \
-        ${GPUs_used_training} ${GPUs_used_inference} ${model_name} \
+        ${GPU_used_training} ${GPU_used_inference} ${model_name} \
         ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble} ${processed_dir}
 elif [[ "${model_level}" == 'word' ]]; then
     ${full_process_sh} ${processed_dir}/bin None \
         ${EMBED_URL} ${jieba_seg_test_input} ${gold_edit} ${m2scorer_url} \
-        ${GPUs_used_training} ${GPUs_used_inference} ${model_name}  \
+        ${GPU_used_training} ${GPU_used_inference} ${model_name} \
         ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble} ${processed_dir}
 else
     ${full_process_sh} ${processed_dir}/bin None \
         ${EMBED_URL} ${char_seg_test_input} ${gold_edit} ${m2scorer_url} \
-        ${GPUs_used_training} ${GPUs_used_inference} ${model_name}  \
+        ${GPU_used_training} ${GPU_used_inference} ${model_name} \
         ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble} ${processed_dir}
 fi
 

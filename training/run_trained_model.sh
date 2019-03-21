@@ -26,7 +26,7 @@ if [[ $# -ge 6 ]]; then
         fi
     fi
 else
-    echo "Usage: `basename $0` <input_file> <output_dir> <GPU device id to use(e.g: '0, 1, 2')> <path to model_file/dir> <dir to bin data> <dir to BPE model> [optional args: <path-to-reranker-weights> <features, e.g: 'eo' or 'lm' or 'eolm'> <trained language model's url>]"
+    echo "Usage: `basename $0` <input_file> <output_dir> <GPU device id to use(e.g: 0)> <path to model_file/dir> <dir to bin data> <dir to BPE model> [optional args: <path-to-reranker-weights> <features, e.g: 'eo' or 'lm' or 'eolm'> <trained language model's url>]"
     exit -1
 fi
 

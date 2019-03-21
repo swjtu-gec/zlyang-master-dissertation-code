@@ -7,12 +7,12 @@ set -e
 source ../paths.sh
 
 if [[ $# != 6 ]]; then
-    echo "Usage: `basename $0` <dir to bin data> <GPU device id to use(e.g: '0, 1, 2')> <model_name(e.g: fconv_zh_bpe)> <random seed> <max tokens> <max sentences>"
+    echo "Usage: `basename $0` <dir to bin data> <GPU device id to use(e.g: 0)> <model_name(e.g: fconv_zh_bpe)> <random seed> <max tokens> <max sentences>"
     exit -1
 fi
 
 DATA_BIN_DIR=$1
-use_gpus=$2
+gpu_to_use=$2
 model_name=$3
 SEED=$4
 MAX_TOKENS=$5
@@ -21,7 +21,7 @@ MAX_SENS=$6
 OUT_DIR=models/${model_name}/model${SEED}/
 mkdir -p ${OUT_DIR}
 
-CUDA_VISIBLE_DEVICES="${use_gpus}" python ${FAIRSEQPY}/train.py \
+CUDA_VISIBLE_DEVICES="${gpu_to_use}" python ${FAIRSEQPY}/train.py \
     ${DATA_BIN_DIR} \
     --save-dir ${OUT_DIR} \
     -a fconv \
