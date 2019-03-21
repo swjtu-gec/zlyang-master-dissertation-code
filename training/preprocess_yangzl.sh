@@ -5,8 +5,8 @@ set -e
 
 source ../paths.sh
 
-if [[ $# != 8 ]]; then
-    echo "Usage: `basename $0` <dir to processed data(e.g: zh-bpe-processed-fusion)> <whether to use BPE(e.g: true)> <whether to remove same sen pairs(e.g: false)> <dir to split train and dev token-level data(e.g: zh-fusion)> <dir to BPE model(e.g: models/zh_bpe_model_fusion)> <BPE operations(e.g: 30000)> <src vocab size(e.g: 37000)> <tgt vocab size(e.g: 37000)>"
+if [[ $# != 9 ]]; then
+    echo "Usage: `basename $0` <dir to processed data(e.g: zh-bpe-processed-fusion)> <whether to use BPE(e.g: true)> <whether to remove same sen pairs(e.g: false)> <train data prefix> <dev data prefix> <dir to BPE model(e.g: models/zh_bpe_model_fusion)> <BPE operations(e.g: 30000)> <src vocab size(e.g: 37000)> <tgt vocab size(e.g: 37000)>"
     exit -1
 fi
 
@@ -14,11 +14,12 @@ PROCESSED_DIR=$1
 mkdir -p ${PROCESSED_DIR}
 use_bpe=$2
 remove_same=$3
-SPLIT_TOKEN_DATA_DIR=$4
-BPE_MODEL_DIR=$5
-bpe_operations=$6
-src_vocab_size=$7
-tgt_vocab_size=$8
+train_data_prefix=$4
+dev_data_prefix=$5
+BPE_MODEL_DIR=$6
+bpe_operations=$7
+src_vocab_size=$8
+tgt_vocab_size=$9
 
 # path to sub-word nmt
 SUBWORD_NMT=${SOFTWARE_DIR}/subword-nmt
@@ -26,8 +27,6 @@ BPE_MODEL=train.bpe.model
 # paths to training and development datasets
 src_ext=src
 trg_ext=trg
-train_data_prefix=${SPLIT_TOKEN_DATA_DIR}/train.tok
-dev_data_prefix=${SPLIT_TOKEN_DATA_DIR}/dev.tok
 
 if [[ "${use_bpe}" == 'true' ]]; then
     # sub-word segmentation

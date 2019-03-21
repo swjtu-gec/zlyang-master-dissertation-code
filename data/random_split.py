@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 import sys
 
 import numpy.random as rdm
@@ -14,10 +15,11 @@ rdm.seed(1234)
 
 
 def main(args):
-    train_src = 'train.tok.src'
-    train_trg = 'train.tok.trg'
-    dev_src = 'dev.tok.src'
-    dev_trg = 'dev.tok.trg'
+    prefix = re.split('/+', args.all_src_fname)[-1].replace('.src', '')
+    train_src = prefix + '.train.tok.src'
+    train_trg = prefix + '.train.tok.trg'
+    dev_src = prefix + '.dev.tok.src'
+    dev_trg = prefix + '.dev.tok.trg'
 
     all_train_src = args.all_src_fname
     all_train_trg = args.all_trg_fname
@@ -26,8 +28,8 @@ def main(args):
     dev_src = os.path.join(args.output_dir, dev_src)
     dev_trg = os.path.join(args.output_dir, dev_trg)
 
-    all_train_line_cnt = reader.count_lines(all_train_src, args.encoding)
-    dev_ratio = args.dev_samples_num / all_train_line_cnt
+    all_train_lines_cnt = reader.count_lines(all_train_src, args.encoding)
+    dev_ratio = args.dev_samples_num / all_train_lines_cnt
 
     with open(all_train_src, 'r', encoding=args.encoding) as all_src_file, \
             open(all_train_trg, 'r', encoding=args.encoding) as all_trg_file, \

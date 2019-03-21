@@ -80,7 +80,7 @@ def remove_same(raw_fname, after_fname, encoding):
 @click.option('--high', type=float, help='len ratio > `high` will be removed, e.g: 9')
 @click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
 def remove_len_ratio(src_fname, trg_fname, low, high, encoding):
-    suffix = '.remove.lenratio'
+    suffix = '.remove_low'+str(low)+'_high'+str(high)
     raw_lines_cnt = reader.count_lines(src_fname, encoding)
     assert raw_lines_cnt == reader.count_lines(trg_fname, encoding), 'line count does not match...'
     with open(src_fname, 'r', encoding=encoding) as src_file, \
@@ -109,7 +109,7 @@ def remove_len_ratio(src_fname, trg_fname, low, high, encoding):
 @click.option('--long', type=int, help='sen pairs len > `long` will be removed')
 @click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
 def remove_long_short(src_fname, trg_fname, short, long, encoding):
-    suffix = '.remove.longshort'
+    suffix = '.remove_short'+str(short)+'_long'+str(long)
     raw_lines_cnt = reader.count_lines(src_fname, encoding)
     assert raw_lines_cnt == reader.count_lines(trg_fname, encoding), 'line count does not match...'
     with open(src_fname, 'r', encoding=encoding) as src_file, \
