@@ -60,9 +60,11 @@ def remove_same(raw_fname, after_fname, encoding):
     assert raw_fname != after_fname, 'raw and trg filename are the same'
     with open(raw_fname, 'r', encoding=encoding) as raw_file, \
             open(after_fname, 'w', encoding=encoding) as after_file:
-        distinct = set(raw_file.read().splitlines())
-        for line in distinct:
-            after_file.write(line + '\n')
+        distinct = set()
+        for line in raw_file:
+            if line not in distinct:
+                distinct.add(line)
+                after_file.write(line)
     print('=================================================')
     raw_lines_cnt = reader.count_lines(raw_fname, encoding)
     after_lines_cnt = reader.count_lines(after_fname, encoding)
