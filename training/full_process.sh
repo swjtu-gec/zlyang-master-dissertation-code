@@ -7,31 +7,44 @@ set -e
 
 source ../paths.sh
 
-training_dir=${BASE_DIR}/training
-train_sh=${training_dir}/train_yangzl.sh
-train_embed_sh=${training_dir}/train_embed_yangzl.sh
-run_trained_model_sh=${training_dir}/run_trained_model.sh
-remove_spac_pkunlp_segment_sh=${training_dir}/remove_spac_pkunlp_segment.sh
+run_trained_model_sh=${BASE_DIR}/training/run_trained_model.sh
+remove_spac_pkunlp_segment_sh=${BASE_DIR}/training/remove_spac_pkunlp_segment.sh
 
 
-if [[ $# -eq 14 ]]; then
-    BIN_DATA_DIR=$1
-    BPE_MODEL_DIR=$2
-    EMBED_URL=$3
-    test_input=$4
-    gold_edit=$5
-    m2scorer_url=$6
-    GPU_used_training=$7
-    GPU_used_inference=$8
-    model_name=$9
-    MAX_TOKENS=${10}
-    MAX_SENS=${11}
-    random_seed=${12}
-    want_ensemble=${13}
-    dev_data_dir=${14}
+if [[ $# -eq 15 ]]; then
+    model_arch=$1
+    BIN_DATA_DIR=$2
+    BPE_MODEL_DIR=$3
+    EMBED_URL=$4
+    test_input=$5
+    gold_edit=$6
+    m2scorer_url=$7
+    GPU_used_training=$8
+    GPU_used_inference=$9
+    model_name=${10}
+    MAX_TOKENS=${11}
+    MAX_SENS=${12}
+    random_seed=${13}
+    want_ensemble=${14}
+    dev_data_dir=${15}
 else
-    echo "Usage: `basename $0` <dir to bin data> <dir to BPE model> <embed_file_url> <test input> <url to gold edit> <url to m2scorer script> <GPU device id to use in training(e.g: 0)> <GPU device id used in test)> <model name(e.g: fconv_zh_bpe_embed_fusion)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: true or false)> <dir to dev data>"
+    echo "Usage: `basename $0` <model arch, e.g: lstm, fconv, transformer> <dir to bin data> <dir to BPE model> <embed_file_url> <test input> <url to gold edit> <url to m2scorer script> <GPU device id to use in training(e.g: 0)> <GPU device id used in test)> <model name(e.g: fconv_zh_bpe_embed_fusion)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: true or false)> <dir to dev data>"
     exit -1
+fi
+
+
+if [[ ${model_arch} == 'fconv' ]]; then
+    train_sh=${BASE_DIR}/training/train_fconv.sh
+    train_embed_sh=${BASE_DIR}/training/train_fconv_embed.sh
+elif [[ "$model_arch" == 'lstm' ]]; then
+    train_sh=${BASE_DIR}/training/train_lstm.sh
+    train_embed_sh=${BASE_DIR}/training/train_lstm_embed.sh
+elif [[ "$model_arch" == 'transformer' ]]; then
+    train_sh=${BASE_DIR}/training/train_transformer.sh
+    train_embed_sh=${BASE_DIR}/training/train_transformer_embed.sh
+else
+    echo "illegal model architecture, got $model_arch"
+    exit -2
 fi
 
 
