@@ -76,6 +76,33 @@ def remove_same(raw_fname, after_fname, encoding):
 @click.command()
 @click.option('--src-fname', type=str, help='the source filename')
 @click.option('--trg-fname', type=str, help='the target filename')
+@click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
+def remove_same_src_trg(src_fname, trg_fname, encoding):
+    raw_lines_cnt = reader.count_lines(src_fname, encoding)
+    assert raw_lines_cnt == reader.count_lines(trg_fname, encoding), 'lines count does not match...'
+    src_after = src_fname+'.removesame'
+    trg_after = trg_fname+'.removesame'
+    with open(src_fname, 'r', encoding=encoding) as src_file, \
+            open(trg_fname, 'r', encoding=encoding) as trg_file, \
+            open(src_after, 'w', encoding=encoding) as src_after_file, \
+            open(trg_after, 'w', encoding=encoding) as trg_after_file:
+        distinct = set()
+        for src_line, trg_line in zip(src_file, trg_file):
+            if src_line+trg_line not in distinct:
+                distinct.add(src_line+trg_line)
+                src_after_file.write(src_line)
+                trg_after_file.write(trg_line)
+    print('=================================================')
+    after_lines_cnt = reader.count_lines(src_after, encoding)
+    assert after_lines_cnt == reader.count_lines(trg_after, encoding), 'lines count does not match...'
+    print('before lines count:', raw_lines_cnt)
+    print('after remove:', after_lines_cnt)
+    print('remove %.2f%% data' % ((raw_lines_cnt - after_lines_cnt) / raw_lines_cnt * 100))
+
+
+@click.command()
+@click.option('--src-fname', type=str, help='the source filename')
+@click.option('--trg-fname', type=str, help='the target filename')
 @click.option('--low', type=float, help='len ratio < `low` will be removed, e.g: 0.1')
 @click.option('--high', type=float, help='len ratio > `high` will be removed, e.g: 9')
 @click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
@@ -135,6 +162,7 @@ def entry_point():
 
 entry_point.add_command(segment_wiki)
 entry_point.add_command(remove_same)
+entry_point.add_command(remove_same_src_trg)
 entry_point.add_command(remove_len_ratio)
 entry_point.add_command(remove_long_short)
 
