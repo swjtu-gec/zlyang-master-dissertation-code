@@ -8,14 +8,15 @@ if [[ $# != 4 ]]; then
     exit -1
 fi
 
-cur_path=`pwd`
 TO_CONCAT_DIR=$1
 src_ext=$2
 trg_ext=$3
 fusion_prefix=$4
 
-cd ${TO_CONCAT_DIR} && src_fnames=`ls | grep ${src_ext}`
-cd ${cur_path}
+test -e ${fusion_prefix}.${src_ext} && rm ${fusion_prefix}.${src_ext}
+test -e ${fusion_prefix}.${trg_ext} && rm ${fusion_prefix}.${trg_ext}
+
+src_fnames=`ls ${TO_CONCAT_DIR} | grep ${src_ext}`
 for src_fname in ${src_fnames}
 do
     src_fname=${TO_CONCAT_DIR}/${src_fname}
