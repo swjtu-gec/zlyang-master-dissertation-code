@@ -74,9 +74,11 @@ fi
 if [[ "$model_level" == 'char' ]]; then
     token_suffix='char'
     flag='--char-level'
+    char_bool_flag='true'
 else
     token_suffix='word'
     flag=''
+    char_bool_flag='false'
 fi
 
 if [[ ! -f "$nlpcc_betterseg_src.$token_suffix" || ! -f "$nlpcc_betterseg_trg.$token_suffix" || "$force_redo_remove_same_and_seg" == true ]]; then
@@ -101,30 +103,28 @@ fi
 if [[ ! -f "$hsk_data_dir/hsk.src.$token_suffix" || ! -f "$hsk_data_dir/hsk.trg.$token_suffix" || "$force_redo_remove_same_and_seg" == true ]]; then
     if [[ ${fusion_mode} == 2 || ${fusion_mode} == 3 ]]; then
         sed 's/ //g' ${hsk_data_dir}/hsk.src > ${hsk_data_dir}/hsk.src.remove.spac
-        python ${segment_py} \
-            --raw-fname=${hsk_data_dir}/hsk.src.remove.spac \
-            --seg-fname=${hsk_data_dir}/hsk.src.${token_suffix} \
-            ${flag} --encoding=${encoding}
         sed 's/ //g' ${hsk_data_dir}/hsk.trg > ${hsk_data_dir}/hsk.trg.remove.spac
-        python ${segment_py} \
-            --raw-fname=${hsk_data_dir}/hsk.trg.remove.spac \
-            --seg-fname=${hsk_data_dir}/hsk.trg.${token_suffix} \
-            ${flag} --encoding=${encoding}
+        python ${preprocessing_py} segment-src-trg \
+            --src-fname=${hsk_data_dir}/hsk.src.remove.spac \
+            --trg-fname=${hsk_data_dir}/hsk.trg.remove.spac \
+            --src-seg=${hsk_data_dir}/hsk.src.${token_suffix} \
+            --trg-seg=${hsk_data_dir}/hsk.trg.${token_suffix} \
+            --char-level=${char_bool_flag} \
+            --encoding=${encoding}
     fi
 fi
 
 if [[ ! -f "$blcu_data_dir/lang8.src.$token_suffix" || ! -f "$blcu_data_dir/lang8.trg.$token_suffix" || "$force_redo_remove_same_and_seg" == true ]]; then
     if [[ ${fusion_mode} == 3 ]]; then
         sed 's/ //g' ${blcu_data_dir}/lang8.src > ${blcu_data_dir}/lang8.src.remove.spac
-        python ${segment_py} \
-            --raw-fname=${blcu_data_dir}/lang8.src.remove.spac \
-            --seg-fname=${blcu_data_dir}/lang8.src.${token_suffix} \
-            ${flag} --encoding=${encoding}
         sed 's/ //g' ${blcu_data_dir}/lang8.trg > ${blcu_data_dir}/lang8.trg.remove.spac
-        python ${segment_py} \
-            --raw-fname=${blcu_data_dir}/lang8.trg.remove.spac \
-            --seg-fname=${blcu_data_dir}/lang8.trg.${token_suffix} \
-            ${flag} --encoding=${encoding}
+        python ${preprocessing_py} segment-src-trg \
+            --src-fname=${blcu_data_dir}/lang8.src.remove.spac \
+            --trg-fname=${blcu_data_dir}/lang8.trg.remove.spac \
+            --src-seg=${blcu_data_dir}/lang8.src.${token_suffix} \
+            --trg-seg=${blcu_data_dir}/lang8.trg.${token_suffix} \
+            --char-level=${char_bool_flag} \
+            --encoding=${encoding}
     fi
 fi
 
