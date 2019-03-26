@@ -13,11 +13,23 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(PROJECT_ROOT)
 
 from utils import reader
+from utils import tools
 
 # convert traditional Chinese to simplified Chinese
 CC = OpenCC('t2s')
 # remove non Chinese char and so on.
 REGEX = re.compile(r'[^\u4e00-\u9fa5aA-Za-z0-9、：“”‘’（）【】[\]——.-《》·。？！，；]')
+remove_pattern = re.compile(r'[^\u4e00-\u9fa5aA-Za-z0-9、：:"“”\'‘’()（）【】[\]——.-<>《》·。?？!！,，;；]')
+empty_pattern = re.compile('\\s+')
+
+
+def segment_sen(sen, char_level):
+    sen = CC.convert(remove_pattern.sub(' ', sen))
+    if char_level:
+        segmented = tools.sen2chars(sen)
+    else:
+        segmented = jieba.lcut(sen)
+    return list(filter(lambda x: x.strip(), segmented))
 
 
 def segment_line(line):
@@ -50,6 +62,42 @@ def segment_wiki(input_file, output_file):
                     fout.write(_wrap_func(section_title))
                     for text in section_text.splitlines():
                         fout.write(_wrap_func(text))
+
+
+@click.command()
+@click.option('--src-fname', type=str, help='the source filename')
+@click.option('--trg-fname', type=str, help='the target filename')
+@click.option('--src-seg', type=str, help='the src segmented filename')
+@click.option('--trg-seg', type=str, help='the trg segmented filename')
+@click.option('--char-level', type=bool, help='whether to cut sentence in char level')
+@click.option('--encoding', type=str, default='utf-8', help='open and save encoding')
+def segment_src_trg(src_fname, trg_fname, src_seg, trg_seg, char_level, encoding):
+    assert src_fname != src_seg, 'source raw and segmented filename are the same'
+    assert trg_fname != trg_seg, 'target raw and segmented filename are the same'
+    with open(src_fname, 'r', encoding=encoding) as src_file, \
+            open(trg_fname, 'r', encoding=encoding) as trg_file, \
+            open(src_seg, 'w', encoding=encoding) as src_seg_file, \
+            open(trg_seg, 'w', encoding=encoding) as trg_seg_file:
+        lines_cnt = 0
+        for src_line, trg_line in zip(src_file, trg_file):
+            src_to_write = ' '.join(segment_sen(src_line, char_level)) + '\n'
+            trg_to_write = ' '.join(segment_sen(trg_line, char_level)) + '\n'
+            if empty_pattern.match(src_to_write) or src_to_write in ['']:
+                continue
+            if empty_pattern.match(trg_to_write) or trg_to_write in ['']:
+                continue
+            src_seg_file.write(src_to_write)
+            trg_seg_file.write(trg_to_write)
+            lines_cnt += 1
+            if lines_cnt % 100000 == 0:
+                print(lines_cnt, 'lines have been processed.')
+
+    print('=================================================')
+    print(lines_cnt, 'lines have been processed finally.')
+    print('raw file lines count:', reader.count_lines(src_fname, encoding))
+    segmented_lines_cnt = reader.count_lines(src_seg, encoding)
+    assert segmented_lines_cnt == reader.count_lines(trg_seg, encoding), 'segmented lines count does not match...'
+    print('segmented file lines count:', segmented_lines_cnt)
 
 
 @click.command()
@@ -161,6 +209,7 @@ def entry_point():
 
 
 entry_point.add_command(segment_wiki)
+entry_point.add_command(segment_src_trg)
 entry_point.add_command(remove_same)
 entry_point.add_command(remove_same_src_trg)
 entry_point.add_command(remove_len_ratio)
