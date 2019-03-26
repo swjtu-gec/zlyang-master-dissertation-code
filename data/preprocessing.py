@@ -32,13 +32,17 @@ def segment_sen(sen, char_level):
     return list(filter(lambda x: x.strip(), segmented))
 
 
-def segment_line(line):
+def segment_line(line, char_level):
     line = CC.convert(REGEX.sub(' ', line))
-    return list(filter(lambda x: x.strip(), jieba.cut(line)))
+    if char_level:
+        segmented = tools.sen2chars(line)
+    else:
+        segmented = jieba.lcut(line)
+    return list(filter(lambda x: x.strip(), segmented))
 
 
-def _wrap_func(to_process):
-    seg_tmp = ' '.join(segment_line(to_process))
+def _wrap_func(to_process, char_level):
+    seg_tmp = ' '.join(segment_line(to_process, char_level))
     if seg_tmp not in ['', '\n']:
         seg_tmp += '\n'
         return seg_tmp.encode('utf-8')
@@ -49,19 +53,21 @@ def _wrap_func(to_process):
 @click.command()
 @click.option('--input-file', type=str, help='url to wiki.json.gz')
 @click.option('--output-file', type=str, help='url to wiki.seg.txt')
-def segment_wiki(input_file, output_file):
+@click.option('--char-level', type=bool, help='whether to cut sentence in char level')
+def segment_wiki(input_file, output_file, char_level):
     """
     :return: nothing to return
     """
+    assert input_file != output_file, 'input and output filenames are the same'
     with smart_open(input_file) as fin:
         with smart_open(output_file, 'wb') as fout:
             for line in tqdm(fin):
                 article = json.loads(line)
-                fout.write(_wrap_func(article['title']))
+                fout.write(_wrap_func(article['title'], char_level))
                 for section_title, section_text in zip(article['section_titles'], article['section_texts']):
-                    fout.write(_wrap_func(section_title))
+                    fout.write(_wrap_func(section_title, char_level))
                     for text in section_text.splitlines():
-                        fout.write(_wrap_func(text))
+                        fout.write(_wrap_func(text, char_level))
 
 
 @click.command()
