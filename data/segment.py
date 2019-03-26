@@ -51,7 +51,7 @@ def main(args):
             to_write = ' '.join(segment_sen(line, args.char_level, args.noHMM)) + '\n'
             seg_file.write(to_write)
             line_cnt += 1
-            if line_cnt % 10000 == 0:
+            if line_cnt % 100000 == 0:
                 print(line_cnt, 'lines have been processed.')
 
     print('=================================================')

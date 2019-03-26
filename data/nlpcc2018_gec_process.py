@@ -89,7 +89,7 @@ def main(args):
                     continue
 
             line_cnt += 1
-            if line_cnt % 10000 == 0:
+            if line_cnt % 100000 == 0:
                 print(line_cnt, 'lines have been processed.')
 
     print('=================================================')
