@@ -44,7 +44,7 @@ do
     high=${arr[3]}
     echo "$short $long $low $high"
     ${one_script_to_run_all_sh} ${model_arch} ${model_level} ${which_pretrained_embed} ${fusion_mode} \
-        ${low} ${high} ${short} ${long} \
+        ${short} ${long} ${low} ${high} \
         ${src_vocab_size} ${trg_vocab_size} ${GPU_used_training} ${GPU_used_inference} \
         ${MAX_TOKENS} ${MAX_SENS} ${random_seed} ${want_ensemble} ${force_redo_remove_same_and_seg}
 done
