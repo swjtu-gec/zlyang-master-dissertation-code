@@ -190,9 +190,9 @@ ${convert_parallel_to_m2_sh} ${edit_creator_sh} ${processed_dir} \
 
 if [[ "${model_level}" == 'bpe' ]]; then
     if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/chinesegigawordv5.jian.jieba.seg.bpe.structed.skipngram.500d.txt
+        EMBED_URL=${BASE_DIR}/data/embeddings/chinesegigawordv5.jian.jieba.seg.bpe.structured.skipngram.500d.txt
     elif [[ ${which_pretrained_embed} == 'word2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.word2vec.skipgram.500d.txt
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.word2vec.skipgram.ns.500d.txt
     elif [[ ${which_pretrained_embed} == 'fasttext' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.fasttext.500d.txt
     else
@@ -200,13 +200,13 @@ if [[ "${model_level}" == 'bpe' ]]; then
     fi
 elif [[ ${model_level} == 'word' ]]; then
     if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.word.structed.skipngram.500d.txt
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.word.structured.skipngram.500d.txt
     else
         EMBED_URL=noEmb
     fi
 else
     if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.structed.skipngram.500d.txt
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.structured.skipngram.500d.txt
     else
         EMBED_URL=noEmb
     fi
