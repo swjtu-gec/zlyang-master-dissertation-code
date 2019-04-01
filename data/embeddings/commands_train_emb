@@ -1,0 +1,12 @@
+# word2vec
+./word2vec -train ${emb-traindata}/wiki.zh.seg.txt -output ${embeddings}/wiki.zh.jian.${level}.word2vec.skipgram.ns.500d.txt -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -threads 8 -iter 5 -binary 0 -cbow 0
+
+# fasttext
+
+
+# wang2vec
+ ./word2vec -train ${emb-traindata}/wiki.zh.seg.txt -output ${embeddings}/wiki.zh.jian.${level}.structured.skipngram.500d.txt -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -nce 0 -threads 8 -iter 5 -binary 0 -type 3 -cap 0
+
+# cw2vec
+./word2vec substoke -input ${emb-traindata}/wiki.zh.seg.txt -infeature ${cw2vec_dir}/Simplified_Chinese_Feature/sin_chinese_feature.txt -output ${embeddings}/wiki.zh.jian.${level}.cw2vec.500d.txt -lr 0.025 -dim 500 -ws 10 -epoch 5 -minCount 10 -neg 10 -loss ns -minn 3 -maxn 6 -thread 8 -t 1e-4
+
