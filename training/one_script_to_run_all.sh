@@ -209,6 +209,8 @@ else
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.structured.skipngram.500d.txt
     elif [[ ${which_pretrained_embed} == 'cw2vec' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt.vec
+    elif [[ ${which_pretrained_embed} == 'word2vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.word2vec.skipgram.ns.500d.txt
     else
         EMBED_URL=noEmb
     fi
