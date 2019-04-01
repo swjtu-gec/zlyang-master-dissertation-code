@@ -39,7 +39,7 @@ edit_creator_sh=${BASE_DIR}/software/m2scorer/scripts/edit_creator.py
 if [[ $# -eq 17 ]]; then
     model_arch=$1  # lstm, fconv, transformer
     model_level=$2  # bpe, char, word
-    which_pretrained_embed=$3  # noEmb, word2vec, fasttext, wang2vec
+    which_pretrained_embed=$3  # noEmb, word2vec, fasttext, wang2vec, cw2vec
     fusion_mode=$4  # 1: nlpcc_betterseg; 2: nlpcc_betterseg+HSK; 3: nlpcc_betterseg+HSK+BLCU
     short=$5
     long=$6
@@ -55,7 +55,7 @@ if [[ $# -eq 17 ]]; then
     want_ensemble=${16}
     force_redo_remove_same_and_seg=${17}
 else
-    echo "Usage: `basename $0` <model arch, e.g: fconv, lstm, transformer> <model level, e.g: bpe, char, word> <use which pre-trained token embeddings, e.g: noEmb, word2vec, fasttext, wang2vec> <fusion mode: 1: nlpcc_betterseg; 2: nlpcc_betterseg+HSK; 3: nlpcc_betterseg+HSK+BLCU> <short, e.g: 1> <long, e.g: 100> <low, e.g: 0.0> <high, e.g: 9.0> <src_vocab_size> <trg_vocab_size> <GPU device id to use in training(e.g: 0)> <GPU device id used in test)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: false)> <whether to force redo remove same and segmentation(e.g: false)>"
+    echo "Usage: `basename $0` <model arch, e.g: fconv, lstm, transformer> <model level, e.g: bpe, char, word> <use which pre-trained token embeddings, e.g: noEmb, word2vec, fasttext, wang2vec, cw2vec> <fusion mode: 1: nlpcc_betterseg; 2: nlpcc_betterseg+HSK; 3: nlpcc_betterseg+HSK+BLCU> <short, e.g: 1> <long, e.g: 100> <low, e.g: 0.0> <high, e.g: 9.0> <src_vocab_size> <trg_vocab_size> <GPU device id to use in training(e.g: 0)> <GPU device id used in test)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: false)> <whether to force redo remove same and segmentation(e.g: false)>"
     exit -1
 fi
 
