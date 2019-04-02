@@ -39,7 +39,7 @@ edit_creator_sh=${BASE_DIR}/software/m2scorer/scripts/edit_creator.py
 if [[ $# -eq 17 ]]; then
     model_arch=$1  # lstm, fconv, transformer
     model_level=$2  # bpe, char, word
-    which_pretrained_embed=$3  # noEmb, word2vec, fasttext, wang2vec, cw2vec
+    which_pretrained_embed=$3  # random, word2vec, wang2vec, cw2vec
     fusion_mode=$4  # 1: nlpcc_betterseg; 2: nlpcc_betterseg+HSK; 3: nlpcc_betterseg+HSK+BLCU
     short=$5
     long=$6
@@ -55,7 +55,7 @@ if [[ $# -eq 17 ]]; then
     want_ensemble=${16}
     force_redo_remove_same_and_seg=${17}
 else
-    echo "Usage: `basename $0` <model arch, e.g: fconv, lstm, transformer> <model level, e.g: bpe, char, word> <use which pre-trained token embeddings, e.g: noEmb, word2vec, fasttext, wang2vec, cw2vec> <fusion mode: 1: nlpcc_betterseg; 2: nlpcc_betterseg+HSK; 3: nlpcc_betterseg+HSK+BLCU> <short, e.g: 1> <long, e.g: 100> <low, e.g: 0.0> <high, e.g: 9.0> <src_vocab_size> <trg_vocab_size> <GPU device id to use in training(e.g: 0)> <GPU device id used in test)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: false)> <whether to force redo remove same and segmentation(e.g: false)>"
+    echo "Usage: `basename $0` <model arch, e.g: fconv, lstm, transformer> <model level, e.g: bpe, char, word> <use which pre-trained token embeddings, e.g: random, word2vec, wang2vec, cw2vec> <fusion mode: 1: nlpcc_betterseg; 2: nlpcc_betterseg+HSK; 3: nlpcc_betterseg+HSK+BLCU> <short, e.g: 1> <long, e.g: 100> <low, e.g: 0.0> <high, e.g: 9.0> <src_vocab_size> <trg_vocab_size> <GPU device id to use in training(e.g: 0)> <GPU device id used in test)> <max tokens> <max sentences> <random seed> <whether to use entire model dir to ensemble decoding(e.g: false)> <whether to force redo remove same and segmentation(e.g: false)>"
     exit -1
 fi
 
@@ -189,30 +189,44 @@ ${convert_parallel_to_m2_sh} ${edit_creator_sh} ${processed_dir} \
     ${fusion_src//.src/''}.${token_suffix}.removesame.remove_low${low}_high${high}.remove_short${short}_long${long}.dev.tok.trg
 
 if [[ "${model_level}" == 'bpe' ]]; then
-    if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
+    if [[ ${which_pretrained_embed} == 'blcu-wang2vec' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/chinesegigawordv5.jian.jieba.seg.bpe.structured.skipngram.500d.txt
+    elif [[ ${which_pretrained_embed} == 'wiki-wang2vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.structured.skipngram.500d.txt
     elif [[ ${which_pretrained_embed} == 'word2vec' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.word2vec.skipgram.ns.500d.txt
-    elif [[ ${which_pretrained_embed} == 'fasttext' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.fasttext.500d.txt
+    elif [[ ${which_pretrained_embed} == 'random' ]]; then
+        EMBED_URL=random
     else
-        EMBED_URL=noEmb
+        echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
+        echo "usage: blcu-wang2vec or wiki-wang2vec or word2vec or random"
+        exit -4
     fi
 elif [[ ${model_level} == 'word' ]]; then
     if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.word.structured.skipngram.500d.txt
+    elif [[ ${which_pretrained_embed} == 'random' ]]; then
+        EMBED_URL=random
     else
-        EMBED_URL=noEmb
+        echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
+        echo "usage: wang2vec or random"
+        exit -4
     fi
 else
     if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.structured.skipngram.500d.txt
-    elif [[ ${which_pretrained_embed} == 'cw2vec' ]]; then
+    elif [[ ${which_pretrained_embed} == 'cw2vec-vec' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt.vec
+    elif [[ ${which_pretrained_embed} == 'cw2vec-avg' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt.avg
     elif [[ ${which_pretrained_embed} == 'word2vec' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.word2vec.skipgram.ns.500d.txt
+    elif [[ ${which_pretrained_embed} == 'random' ]]; then
+        EMBED_URL=random
     else
-        EMBED_URL=noEmb
+        echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
+        echo "usage: wang2vec or cw2vec-vec or cw2vec-avg or word2vec or random"
+        exit -4
     fi
 fi
 
