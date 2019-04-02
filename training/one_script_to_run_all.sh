@@ -59,10 +59,52 @@ else
     exit -1
 fi
 
-if [[ "${model_level}" != 'bpe' && "${model_level}" != 'char' && "${model_level}" != 'word' ]]; then
+
+if [[ "${model_level}" == 'bpe' ]]; then
+    if [[ ${which_pretrained_embed} == 'blcu-wang2vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/chinesegigawordv5.jian.jieba.seg.bpe.structured.skipngram.500d.txt
+    elif [[ ${which_pretrained_embed} == 'wiki-wang2vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.structured.skipngram.500d.txt
+    elif [[ ${which_pretrained_embed} == 'word2vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.word2vec.skipgram.ns.500d.txt
+    elif [[ ${which_pretrained_embed} == 'random' ]]; then
+        EMBED_URL=random
+    else
+        echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
+        echo "usage: blcu-wang2vec or wiki-wang2vec or word2vec or random"
+        exit -3
+    fi
+elif [[ ${model_level} == 'word' ]]; then
+    if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.word.structured.skipngram.500d.txt
+    elif [[ ${which_pretrained_embed} == 'random' ]]; then
+        EMBED_URL=random
+    else
+        echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
+        echo "usage: wang2vec or random"
+        exit -3
+    fi
+elif [[ ${model_level} == 'char' ]]; then
+    if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.structured.skipngram.500d.txt
+    elif [[ ${which_pretrained_embed} == 'cw2vec-vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt.vec
+    elif [[ ${which_pretrained_embed} == 'cw2vec-avg' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt.avg
+    elif [[ ${which_pretrained_embed} == 'word2vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.word2vec.skipgram.ns.500d.txt
+    elif [[ ${which_pretrained_embed} == 'random' ]]; then
+        EMBED_URL=random
+    else
+        echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
+        echo "usage: wang2vec or cw2vec-vec or cw2vec-avg or word2vec or random"
+        exit -3
+    fi
+else
     echo "illegal model level, got ${model_level}"
     exit -2
 fi
+
 
 if [[ ! -f ${nlpcc_train_data_remove_same} || "$force_redo_remove_same_and_seg" == true ]]; then
     python ${preprocessing_py} remove-same \
@@ -70,6 +112,7 @@ if [[ ! -f ${nlpcc_train_data_remove_same} || "$force_redo_remove_same_and_seg" 
         --after-fname=${nlpcc_train_data_remove_same} \
         --encoding=${encoding}
 fi
+
 
 if [[ "$model_level" == 'char' ]]; then
     token_suffix='char'
@@ -80,6 +123,7 @@ else
     flag=''
     char_bool_flag='false'
 fi
+
 
 if [[ ! -f "$nlpcc_betterseg_src.$token_suffix" || ! -f "$nlpcc_betterseg_trg.$token_suffix" || "$force_redo_remove_same_and_seg" == true ]]; then
     if [[ "${model_level}" == 'char' ]]; then
@@ -128,6 +172,7 @@ if [[ ! -f "$blcu_data_dir/lang8.src.$token_suffix" || ! -f "$blcu_data_dir/lang
     fi
 fi
 
+
 if [[ ${fusion_mode} == 1 ]]; then
     fusion_contain="NLPCC_betterseg"
     less ${nlpcc_betterseg_src}.${token_suffix} > ${fusion_src}.${token_suffix}
@@ -142,8 +187,9 @@ elif [[ ${fusion_mode} == 3 ]]; then
     cat ${nlpcc_betterseg_trg}.${token_suffix} ${hsk_data_dir}/hsk.trg.${token_suffix} ${blcu_data_dir}/lang8.trg.${token_suffix} > ${fusion_trg}.${token_suffix}
 else
     echo "illegal fusion mode, got $fusion_mode"
-    exit -3
+    exit -4
 fi
+
 
 # must to do remove same operation here
 python ${preprocessing_py} remove-same-src-trg \
@@ -184,51 +230,11 @@ else
         None -1 ${src_vocab_size} ${trg_vocab_size}
 fi
 
+
 ${convert_parallel_to_m2_sh} ${edit_creator_sh} ${processed_dir} \
     ${fusion_src//.src/''}.${token_suffix}.removesame.remove_low${low}_high${high}.remove_short${short}_long${long}.dev.tok.src \
     ${fusion_src//.src/''}.${token_suffix}.removesame.remove_low${low}_high${high}.remove_short${short}_long${long}.dev.tok.trg
 
-if [[ "${model_level}" == 'bpe' ]]; then
-    if [[ ${which_pretrained_embed} == 'blcu-wang2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/chinesegigawordv5.jian.jieba.seg.bpe.structured.skipngram.500d.txt
-    elif [[ ${which_pretrained_embed} == 'wiki-wang2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.structured.skipngram.500d.txt
-    elif [[ ${which_pretrained_embed} == 'word2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.word2vec.skipgram.ns.500d.txt
-    elif [[ ${which_pretrained_embed} == 'random' ]]; then
-        EMBED_URL=random
-    else
-        echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
-        echo "usage: blcu-wang2vec or wiki-wang2vec or word2vec or random"
-        exit -4
-    fi
-elif [[ ${model_level} == 'word' ]]; then
-    if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.word.structured.skipngram.500d.txt
-    elif [[ ${which_pretrained_embed} == 'random' ]]; then
-        EMBED_URL=random
-    else
-        echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
-        echo "usage: wang2vec or random"
-        exit -4
-    fi
-else
-    if [[ ${which_pretrained_embed} == 'wang2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.structured.skipngram.500d.txt
-    elif [[ ${which_pretrained_embed} == 'cw2vec-vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt.vec
-    elif [[ ${which_pretrained_embed} == 'cw2vec-avg' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt.avg
-    elif [[ ${which_pretrained_embed} == 'word2vec' ]]; then
-        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.char.word2vec.skipgram.ns.500d.txt
-    elif [[ ${which_pretrained_embed} == 'random' ]]; then
-        EMBED_URL=random
-    else
-        echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
-        echo "usage: wang2vec or cw2vec-vec or cw2vec-avg or word2vec or random"
-        exit -4
-    fi
-fi
 
 model_name=${processed_dir##*/}
 model_name=${model_name//processed/$which_pretrained_embed}
