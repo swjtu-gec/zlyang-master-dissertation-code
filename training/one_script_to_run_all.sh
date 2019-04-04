@@ -65,13 +65,17 @@ if [[ "${model_level}" == 'bpe' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/chinesegigawordv5.jian.jieba.seg.bpe.structured.skipngram.500d.txt
     elif [[ ${which_pretrained_embed} == 'wiki-wang2vec' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.structured.skipngram.500d.txt
+    elif [[ ${which_pretrained_embed} == 'cw2vec-vec' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.cw2vec.500d.txt.vec
+    elif [[ ${which_pretrained_embed} == 'cw2vec-avg' ]]; then
+        EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.cw2vec.500d.txt.avg
     elif [[ ${which_pretrained_embed} == 'word2vec' ]]; then
         EMBED_URL=${BASE_DIR}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.word2vec.skipgram.ns.500d.txt
     elif [[ ${which_pretrained_embed} == 'random' ]]; then
         EMBED_URL=random
     else
         echo "illegal pretrained embeddings to use, got $which_pretrained_embed"
-        echo "usage: blcu-wang2vec or wiki-wang2vec or word2vec or random"
+        echo "usage: blcu-wang2vec or wiki-wang2vec or cw2vec-vec or cw2vec-avg or word2vec or random"
         exit -3
     fi
 elif [[ ${model_level} == 'word' ]]; then
