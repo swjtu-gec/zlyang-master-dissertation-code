@@ -30,7 +30,7 @@ CUDA_VISIBLE_DEVICES="${gpu_to_use}" python ${FAIRSEQPY}/train.py \
     --encoder-hidden-size=500 --decoder-hidden-size=1000 \
     --encoder-bidirectional --encoder-layers=2 --decoder-layers=2 \
     --decoder-out-embed-dim=1000 \
-    --fp16 --fp16-init-scale=128 \
+    --clip-norm 0.1 \
     --num-workers=4 --skip-invalid-size-inputs-valid-test \
     --max-epoch 100 \
     --max-tokens ${MAX_TOKENS} --max-sentences ${MAX_SENS} \
