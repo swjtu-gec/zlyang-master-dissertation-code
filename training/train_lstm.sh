@@ -8,7 +8,7 @@ set -x
 source ../paths.sh
 
 if [[ $# != 6 ]]; then
-    echo "Usage: `basename $0` <dir to bin data> <GPU device id to use(e.g: 0)> <model_name(e.g: fconv_zh_bpe)> <random seed> <max tokens> <max sentences>"
+    echo "Usage: `basename $0` <dir to bin data> <GPU device id to use(e.g: 0)> <model_name(e.g: lstm_zh_char_random)> <random seed> <max tokens> <max sentences>"
     exit -1
 fi
 
