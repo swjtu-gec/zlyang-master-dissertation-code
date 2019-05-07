@@ -9,10 +9,9 @@ segment_py=${BASE_DIR}/data/segment.py
 
 encoding='utf-8'
 beam=12
-nbest=${beam}
 
 
-if [[ $# -eq 9 ]]; then
+if [[ $# -eq 10 ]]; then
     input_file=$1
     output_dir=$2
     device=$3
@@ -21,10 +20,21 @@ if [[ $# -eq 9 ]]; then
     bpe_model_path=$6
     BPE_BIN_DATA_DIR=$7
     BPE_MODEL_DIR=$8
-    force_redo_translation=$9
+    channel_output_mode=$9
+    force_redo_translation=${10}
 else
-    echo "Usage: `basename $0` <input_file> <output_dir> <GPU device id to use(e.g: 0)> <path to char level model file/dir> <dir to bin data of char level model> <path to bpe level model file/dir> <dir to bin data of bpe level model> <dir to BPE model> <whether to force redo translation(e.g: false)>"
+    echo "Usage: `basename $0` <input_file> <output_dir> <GPU device id to use(e.g: 0)> <path to char level model file/dir> <dir to bin data of char level model> <path to bpe level model file/dir> <dir to bin data of bpe level model> <dir to BPE model> <channel output mode, e.g: 1-best or n-best> <whether to force redo translation(e.g: false)>"
     exit -1
+fi
+
+
+if [[ ${channel_output_mode} == '1-best' ]]; then
+    nbest=1
+elif [[ ${channel_output_mode} == 'n-best' ]]; then
+    nbest=${beam}
+else
+    echo "illegal channel output mode, got $channel_output_mode"
+    exit -2
 fi
 
 
@@ -37,7 +47,7 @@ elif [[ -f "$char_model_path" ]]; then
     char_models=${char_model_path}
 elif [[ ! -e "$char_model_path" ]]; then
     echo "char level model(s) path not found in $char_model_path"
-    exit -2
+    exit -3
 fi
 
 if [[ -d "$bpe_model_path" ]]; then
@@ -49,7 +59,7 @@ elif [[ -f "$bpe_model_path" ]]; then
     bpe_models=${bpe_model_path}
 elif [[ ! -e "$bpe_model_path" ]]; then
     echo "bpe level model(s) path not found in $bpe_model_path"
-    exit -3
+    exit -4
 fi
 
 
@@ -72,7 +82,7 @@ if [[ ! -e ${M1_output} || ${force_redo_translation} == true ]]; then
     CUDA_VISIBLE_DEVICES="${device}" python ${FAIRSEQPY}/interactive.py \
         --no-progress-bar \
         --path ${char_models} \
-        --beam ${beam} --nbest ${beam} \
+        --beam ${beam} --nbest ${nbest} \
         --model-overrides "{'encoder_embed_path': None, 'decoder_embed_path': None}" \
         ${CHAR_BIN_DATA_DIR} < ${M1_input} > ${M1_output}
 fi
@@ -93,7 +103,7 @@ if [[ ! -e ${M2_output} || ${force_redo_translation} == true ]]; then
     CUDA_VISIBLE_DEVICES="${device}" python ${FAIRSEQPY}/interactive.py \
         --no-progress-bar \
         --path ${bpe_models} \
-        --beam ${beam} --nbest ${beam} \
+        --beam ${beam} --nbest ${nbest} \
         --model-overrides "{'encoder_embed_path': None, 'decoder_embed_path': None}" \
         ${BPE_BIN_DATA_DIR} < ${M2_input} > ${M2_output}
 fi
@@ -111,7 +121,7 @@ if [[ ! -e ${M3_output} || ${force_redo_translation} == true ]]; then
     CUDA_VISIBLE_DEVICES="${device}" python ${FAIRSEQPY}/interactive.py \
         --no-progress-bar \
         --path ${bpe_models} \
-        --beam ${beam} --nbest ${beam} \
+        --beam ${beam} --nbest ${nbest} \
         --model-overrides "{'encoder_embed_path': None, 'decoder_embed_path': None}" \
         ${BPE_BIN_DATA_DIR} < ${M3_input} > ${M3_output}
 fi
@@ -131,7 +141,7 @@ if [[ ! -e ${M4_output} || ${force_redo_translation} == true ]]; then
     CUDA_VISIBLE_DEVICES="${device}" python ${FAIRSEQPY}/interactive.py \
         --no-progress-bar \
         --path ${bpe_models} \
-        --beam ${beam} --nbest ${beam} \
+        --beam ${beam} --nbest ${nbest} \
         --model-overrides "{'encoder_embed_path': None, 'decoder_embed_path': None}" \
         ${BPE_BIN_DATA_DIR} < ${M4_input} > ${M4_output}
 fi
