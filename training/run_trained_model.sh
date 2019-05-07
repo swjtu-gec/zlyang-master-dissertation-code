@@ -62,7 +62,7 @@ beam_search_starttime=$(date +%s)
 CUDA_VISIBLE_DEVICES="${device}" python ${FAIRSEQPY}/interactive.py \
     --no-progress-bar \
     --path ${models} \
-    --beam ${beam} --nbest ${beam} \
+    --beam ${beam} --nbest ${nbest} \
     --model-overrides "{'encoder_embed_path': None, 'decoder_embed_path': None}" \
     ${DATA_BIN_DIR} < ${beam_search_input} > ${output_dir}/beamsearch.output.nbest.txt
 beam_search_endtime=$(date +%s)
