@@ -109,6 +109,11 @@ else
     exit -2
 fi
 
+if [[ ${EMBED_URL} != 'random' && ! -f ${EMBED_URL} ]]; then
+    echo "embeddings file not found in ${EMBED_URL}"
+    exit -4
+fi
+
 
 if [[ ! -f ${nlpcc_train_data_remove_same} || "$force_redo_remove_same_and_seg" == true ]]; then
     python ${preprocessing_py} remove-same \
@@ -191,7 +196,7 @@ elif [[ ${fusion_mode} == 3 ]]; then
     cat ${nlpcc_betterseg_trg}.${token_suffix} ${hsk_data_dir}/hsk.trg.${token_suffix} ${blcu_data_dir}/lang8.trg.${token_suffix} > ${fusion_trg}.${token_suffix}
 else
     echo "illegal fusion mode, got $fusion_mode"
-    exit -4
+    exit -5
 fi
 
 
