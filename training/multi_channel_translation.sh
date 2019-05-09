@@ -156,10 +156,10 @@ if [[ ${use_M4} -ne 0 ]] && [[ ! -e ${M4_output} || ${force_redo_translation} ==
 
     CUDA_VISIBLE_DEVICES="${device}" python ${FAIRSEQPY}/interactive.py \
         --no-progress-bar \
-        --path ${bpe_models} \
+        --path ${char_models} \
         --beam ${beam} --nbest ${nbest} \
         --model-overrides "{'encoder_embed_path': None, 'decoder_embed_path': None}" \
-        ${BPE_BIN_DATA_DIR} < ${M4_input} > ${M4_output}
+        ${CHAR_BIN_DATA_DIR} < ${M4_input} > ${M4_output}
 fi
 
 translation_endtime=$(date +%s)
