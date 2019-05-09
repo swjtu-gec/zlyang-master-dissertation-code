@@ -84,9 +84,9 @@ translation_starttime=$(date +%s)
 mkdir -p ${output_dir}
 sed 's/ //g' ${input_file} > ${output_dir}/input.sen.txt
 
-# ============================
-# M1 channel: char level model
-# ============================
+echo "============================"
+echo "M1 channel: char level model"
+echo "============================"
 M1_output=${output_dir}/M1.fairseq.output.${channel_output_mode}.txt
 if [[ ! -e ${M1_output} || ${force_redo_translation} == true ]]; then
     if [[ ${use_M1} -ne 0 ]]; then
@@ -103,9 +103,9 @@ if [[ ! -e ${M1_output} || ${force_redo_translation} == true ]]; then
     fi
 fi
 
-# ==============================================
-# M2 channel: char level model + bpe level model
-# ==============================================
+echo "==============================================="
+echo "M2 channel: char level model => bpe level model"
+echo "==============================================="
 M2_output=${output_dir}/M2.fairseq.output.${channel_output_mode}.txt
 if [[ ${use_M2} -ne 0 ]] && [[ ! -e ${M2_output} || ${force_redo_translation} == true ]]; then
     M2_input=${output_dir}/M2.input.bpe.txt
@@ -124,9 +124,9 @@ if [[ ${use_M2} -ne 0 ]] && [[ ! -e ${M2_output} || ${force_redo_translation} ==
         ${BPE_BIN_DATA_DIR} < ${M2_input} > ${M2_output}
 fi
 
-# ===========================
-# M3 channel: BPE level model
-# ===========================
+echo "==========================="
+echo "M3 channel: BPE level model"
+echo "==========================="
 M3_output=${output_dir}/M3.fairseq.output.${channel_output_mode}.txt
 if [[ ${use_M3} -ne 0 ]] && [[ ! -e ${M3_output} || ${force_redo_translation} == true ]]; then
     # prepare input for M3 channel
@@ -142,9 +142,9 @@ if [[ ${use_M3} -ne 0 ]] && [[ ! -e ${M3_output} || ${force_redo_translation} ==
         ${BPE_BIN_DATA_DIR} < ${M3_input} > ${M3_output}
 fi
 
-# ==============================================
-# M4 channel: bpe level model + char level model
-# ==============================================
+echo "==============================================="
+echo "M4 channel: bpe level model => char level model"
+echo "==============================================="
 M4_output=${output_dir}/M4.fairseq.output.${channel_output_mode}.txt
 if [[ ${use_M4} -ne 0 ]] && [[ ! -e ${M4_output} || ${force_redo_translation} == true ]]; then
     # prepare input for M4 channel
