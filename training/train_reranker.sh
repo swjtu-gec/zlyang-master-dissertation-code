@@ -96,9 +96,9 @@ CUDA_VISIBLE_DEVICES="${device}" python ${FAIRSEQPY}/interactive.py \
 
 # reformating the nbest file
 if [[ -d "$BPE_MODEL_DIR" ]]; then
-    ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/beamsearch.output.nbest.txt --debpe > ${output_dir}/dev.output.tok.nbest.reformat.txt
+    ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/beamsearch.output.nbest.txt --debpe -o ${output_dir}/dev.output.tok.nbest.reformat.txt
 else
-    ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/beamsearch.output.nbest.txt > ${output_dir}/dev.output.tok.nbest.reformat.txt
+    ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/beamsearch.output.nbest.txt -o ${output_dir}/dev.output.tok.nbest.reformat.txt
 fi
 
 # augmenting the dev nbest

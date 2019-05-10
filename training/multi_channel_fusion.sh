@@ -101,19 +101,19 @@ if [[ ${use_M4} -ne 0 ]]; then
 fi
 
 if [[ ${use_M1} -ne 0 ]]; then
-    ${SCRIPTS_DIR}/nbest_reformat.py -i ${M1_output} > ${M1_output}.reformat
+    ${SCRIPTS_DIR}/nbest_reformat.py -i ${M1_output} -o ${M1_output}.reformat
     to_merge_files=${M1_output}.reformat
 fi
 if [[ ${use_M2} -ne 0 ]]; then
-    ${SCRIPTS_DIR}/nbest_reformat.py -i ${M2_output} --debpe --char-seg > ${M2_output}.reformat
+    ${SCRIPTS_DIR}/nbest_reformat.py -i ${M2_output} --debpe --char-seg -o ${M2_output}.reformat
     to_merge_files="${to_merge_files} ${M2_output}.reformat"
 fi
 if [[ ${use_M3} -ne 0 ]]; then
-    ${SCRIPTS_DIR}/nbest_reformat.py -i ${M3_output} --debpe --char-seg > ${M3_output}.reformat
+    ${SCRIPTS_DIR}/nbest_reformat.py -i ${M3_output} --debpe --char-seg -o ${M3_output}.reformat
     to_merge_files="${to_merge_files} ${M3_output}.reformat"
 fi
 if [[ ${use_M4} -ne 0 ]]; then
-    ${SCRIPTS_DIR}/nbest_reformat.py -i ${M4_output} > ${M4_output}.reformat
+    ${SCRIPTS_DIR}/nbest_reformat.py -i ${M4_output} -o ${M4_output}.reformat
     to_merge_files="${to_merge_files} ${M4_output}.reformat"
 fi
 

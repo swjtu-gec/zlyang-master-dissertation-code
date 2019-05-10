@@ -10,15 +10,16 @@ sys.path.append(PROJECT_ROOT)
 from data.segment import segment_sen
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--input-file',  help='path to input file (output of fairseq)')
-parser.add_argument('--debpe',  action='store_true', help='enable the flag to post-process and remove BPE segmentation.')
+parser.add_argument('-i', '--input-file', required=True, help='path to input file (output of fairseq)')
+parser.add_argument('-o', '--output-file', dest="out_file", required=True, help="path to reformatted file")
+parser.add_argument('--debpe',  action='store_true', help='whether to remove BPE segmentation.')
 parser.add_argument('--char-seg', action='store_true', help='whether to re-seg sentence in char level')
 
 args = parser.parse_args()
 
 
 scount = -1
-with open(args.input_file) as f:
+with open(args.input_file) as f, open(args.out_file, 'w') as out:
     for line in f:
         line = line.strip()
         pieces = line.split('\t')
@@ -32,5 +33,6 @@ with open(args.input_file) as f:
                 hyp = hyp.replace(' ', '')
                 hyp = ' '.join(segment_sen(hyp, True, False))
             score = pieces[1]
-            print("%d ||| %s ||| F0= %s ||| %s" % (scount, hyp, score, score) )
+            to_write = "%d ||| %s ||| F0= %s ||| %s" % (scount, hyp, score, score)
+            out.write(to_write + '\n')
 
