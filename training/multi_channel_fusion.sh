@@ -24,23 +24,26 @@ if [[ $# -ge 12 ]]; then
     bpe_model_path=$9
     BPE_BIN_DATA_DIR=${10}
     BPE_MODEL_DIR=${11}
-    reranker_feats=${12}  # nmt-score, lm-score, lm-score-normalized, eo-feats, lm-feats, eo+lm
+    reranker_feats=${12}  # nmt-score, lm-score, lm-score-normalized, eo-feats, lm-feats, lm-feats-normalized, eo+lm
     reranker_weights=${13}
     char_lm_url=${14}
-    if [[ "${reranker_feats}" == "eo-feats" || "${reranker_feats}" == "lm-feats" || "${reranker_feats}" == "eo+lm" ]]; then
+    if [[ "${reranker_feats}" == "eo-feats" || "${reranker_feats}" == "lm-feats" || \
+        ${reranker_feats} == "lm-feats-normalized" || "${reranker_feats}" == "eo+lm" ]]; then
         if [[ ! -f ${reranker_weights} ]]; then
             echo "weights file not found in ${reranker_weights}"
             exit -2
         fi
     fi
-    if [[ "${reranker_feats}" == "lm-score" || "${reranker_feats}" == "lm-score-normalized" || "${reranker_feats}" == "lm-feats" || "${reranker_feats}" == "eo+lm" ]]; then
+    if [[ "${reranker_feats}" == "lm-score" || "${reranker_feats}" == "lm-score-normalized" || \
+        "${reranker_feats}" == "lm-feats" || ${reranker_feats} == "lm-feats-normalized" || \
+        "${reranker_feats}" == "eo+lm" ]]; then
         if [[ ! -f ${char_lm_url} ]]; then
             echo "char-level language model not found in ${char_lm_url}"
             exit -3
         fi
     fi
 else
-    echo "Usage: `basename $0` <input file in char level> <output_dir> <GPU device id to use(e.g: 0)> <use which channels, e.g: '1 1 0 0'> <channel output mode, e.g: 1-best or n-best> <whether to force redo translation(e.g: false)> <path to char level model file/dir> <dir to bin data of char level model> <path to bpe level model file/dir> <dir to bin data of bpe level model> <dir to BPE model> <features, e.g: nmt-score, lm-score, lm-score-normalized, eo-feats, lm-feats, eo+lm> [optional args: <path-to-reranker-weights> <trained char-level language model's url>]"
+    echo "Usage: `basename $0` <input file in char level> <output_dir> <GPU device id to use(e.g: 0)> <use which channels, e.g: '1 1 0 0'> <channel output mode, e.g: 1-best or n-best> <whether to force redo translation(e.g: false)> <path to char level model file/dir> <dir to bin data of char level model> <path to bpe level model file/dir> <dir to bin data of bpe level model> <dir to BPE model> <features, e.g: nmt-score, lm-score, lm-score-normalized, eo-feats, lm-feats, lm-feats-normalized, eo+lm> [optional args: <path-to-reranker-weights> <trained char-level language model's url>]"
     exit -1
 fi
 
@@ -64,6 +67,8 @@ elif [[ "${reranker_feats}" == "lm-score-normalized" ]]; then
     echo 0 1 > ${reranker_weights}
 elif [[ "${reranker_feats}" == "lm-feats" ]]; then
     featstring="LM('LM0', '$char_lm_url', normalize=False), WordPenalty(name='WordPenalty0')"
+elif [[ "${reranker_feats}" == "lm-feats-normalized" ]]; then
+    featstring="LM('LM0', '$char_lm_url', normalize=True), WordPenalty(name='WordPenalty0')"
 elif [[ "${reranker_feats}" == "eo+lm" ]]; then
     featstring="EditOps(name='EditOps0'), LM('LM0', '$char_lm_url', normalize=False), WordPenalty(name='WordPenalty0')"
 else
