@@ -35,7 +35,7 @@ CUDA_VISIBLE_DEVICES="${gpu_to_use}" python ${FAIRSEQPY}/train.py \
     --lr ${transformer_lr} --min-lr '1e-09' --lr-scheduler inverse_sqrt \
     --criterion label_smoothed_cross_entropy --label-smoothing 0.1 \
     --num-workers=4 --skip-invalid-size-inputs-valid-test \
-    --max-update 200000 --update-freq 8 \
+    --max-update 100000 --update-freq 8 \
     --max-tokens ${MAX_TOKENS} --max-sentences ${MAX_SENS} \
     --no-progress-bar --seed ${SEED}
 
