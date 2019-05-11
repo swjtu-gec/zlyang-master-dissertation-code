@@ -5,20 +5,18 @@ set -x
 
 source ../paths.sh
 
-############################
-# modify following arguments
-############################
-device=0
-use_which_channels='1 1 1 1'
-# 1-best, n-best
-channel_output_mode=n-best
-force_redo_translation=false
-# checkpoint_seed1000_best.pt
-char_model_path=${BASE_DIR}/training/models/4_ens_fconv_char_random_1_2_4_1000
-# checkpoint_seed2_best.pt
-bpe_model_path=models/4_ens_fconv_bpe_word2vec_2_4_5_6/
-# nmt-score, lm-score, lm-score-normalized, eo-feats, lm-feats, lm-feats-normalized, eo+lm
-reranker_feats=eo+lm
+if [[ $# -eq 7 ]]; then
+    device=$1
+    use_which_channels=$2
+    channel_output_mode=$3
+    force_redo_translation=$4
+    char_model_path=$5
+    bpe_model_path=$6
+    reranker_feats=$7
+else
+    echo "Usage: `basename $0` <GPU device id to use(e.g: 0)> <use which channels, e.g: '1 1 1 0'> <channel output mode, e.g: 1-best or n-best> <whether to force redo translation(e.g: false)> <path to char level model file/dir> <path to bpe level model file/dir> <features, e.g: nmt-score, lm-score, lm-score-normalized, eo-feats, lm-feats, lm-feats-normalized, eo+lm>"
+    exit -1
+fi
 
 
 #################
