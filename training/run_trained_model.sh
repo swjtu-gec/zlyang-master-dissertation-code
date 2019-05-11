@@ -97,7 +97,7 @@ if [[ $# -ge 8 ]]; then
     if [[ -d "$BPE_MODEL_DIR" ]]; then
         ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/beamsearch.output.nbest.txt --debpe -o ${output_dir}/output.tok.nbest.reformat.txt
     else
-        ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/beamsearch.output.nbest.txt-o ${output_dir}/output.tok.nbest.reformat.txt
+        ${SCRIPTS_DIR}/nbest_reformat.py -i ${output_dir}/beamsearch.output.nbest.txt -o ${output_dir}/output.tok.nbest.reformat.txt
     fi
     ${NBEST_RERANKER}/augmenter.py -s ${input_file} -i ${output_dir}/output.tok.nbest.reformat.txt -o ${output_dir}/output.tok.nbest.reformat.augmented.txt -f "$featstring"
     ${NBEST_RERANKER}/rerank.py -i ${output_dir}/output.tok.nbest.reformat.augmented.txt -w ${reranker_weights} -o ${output_dir} --clean-up
