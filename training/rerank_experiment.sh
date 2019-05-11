@@ -77,5 +77,5 @@ ${run_trained_model_sh} ${test_input} ${run_models_output_dir} ${device} \
     ${model_path} ${DATA_BIN_DIR} ${BPE_MODEL_DIR} \
     ${reranker_weights} ${reranker_feats} ${lm_url}
 
-${remove_spac_pkunlp_segment_sh} ${m2scorer_url} ${gec_system_output} ${gold_edit} false
+${remove_spac_pkunlp_segment_sh} ${m2scorer_url} ${gec_system_output} ${gold_edit} true
 
