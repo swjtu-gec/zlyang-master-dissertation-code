@@ -14,7 +14,7 @@ use_which_channels='1 1 1 1'
 channel_output_mode=n-best
 force_redo_translation=false
 # checkpoint_seed1000_best.pt
-char_model_path=models/4_ens_top/
+char_model_path=${BASE_DIR}/training/models/4_ens_fconv_char_random_1_2_4_1000
 # checkpoint_seed2_best.pt
 bpe_model_path=models/4_ens_fconv_bpe_word2vec_2_4_5_6/
 # nmt-score, lm-score, lm-score-normalized, eo-feats, lm-feats, lm-feats-normalized, eo+lm
