@@ -80,12 +80,53 @@ ${multi_channel_fusion_experiment_sh} \
     ${bpe_models_dir}/checkpoint_seed2_best.pt \
     eo+lm
 
+echo "############################################"
+echo "M1+M2+M3(single, n-best)+lm-feats-normalized"
+echo "############################################"
+${multi_channel_fusion_experiment_sh} \
+    ${device} "$use_which_channels" n-best ${force_redo_translation} \
+    ${char_models_dir}/checkpoint_seed1000_best.pt \
+    ${bpe_models_dir}/checkpoint_seed2_best.pt \
+    lm-feats-normalized
+
 echo "#############################"
 echo "M1+M2+M3(4 ens, 1-best)+eo+lm"
 echo "#############################"
 ${multi_channel_fusion_experiment_sh} \
     ${device} "$use_which_channels" 1-best ${force_redo_translation} \
     ${char_models_dir} ${bpe_models_dir} eo+lm
+
+echo "###########################################"
+echo "M1+M2+M3(4 ens, 1-best)+lm-feats-normalized"
+echo "###########################################"
+${multi_channel_fusion_experiment_sh} \
+    ${device} "$use_which_channels" 1-best ${force_redo_translation} \
+    ${char_models_dir} ${bpe_models_dir} lm-feats-normalized
+
+
+#####################
+# channel comparision
+#####################
+echo "#####################################"
+echo "M1(4 ens, n-best)+lm-feats-normalized"
+echo "#####################################"
+${multi_channel_fusion_experiment_sh} \
+    ${device} "1 0 0 0" n-best ${force_redo_translation} \
+    ${char_models_dir} ${bpe_models_dir} lm-feats-normalized
+
+echo "########################################"
+echo "M1+M2(4 ens, n-best)+lm-feats-normalized"
+echo "########################################"
+${multi_channel_fusion_experiment_sh} \
+    ${device} "1 1 0 0" n-best ${force_redo_translation} \
+    ${char_models_dir} ${bpe_models_dir} lm-feats-normalized
+
+echo "########################################"
+echo "M1+M2+M3+M4(4 ens, n-best)+lm-feats-normalized"
+echo "########################################"
+${multi_channel_fusion_experiment_sh} \
+    ${device} "1 1 1 1" n-best ${force_redo_translation} \
+    ${char_models_dir} ${bpe_models_dir} lm-feats-normalized
 
 
 #####################
