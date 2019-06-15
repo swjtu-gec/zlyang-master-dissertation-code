@@ -47,15 +47,22 @@
 2. 使用 [gensim工具包](https://github.com/RaRe-Technologies/gensim) 的`gensim.scripts.segment_wiki`模块将中文维基百科语料从XML格式转为json格式（wiki.json.gz）：
     ```bash
     year=2018 && month=11 && day=14
-    python -m gensim.scripts.segment_wiki -i -f ${PROJECT_ROOT}/data/lm-emb-traindata/zhwiki-latest-pages-articles.xml.bz2 -o ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz
+    python -m gensim.scripts.segment_wiki \
+        -i -f ${PROJECT_ROOT}/data/lm-emb-traindata/zhwiki-latest-pages-articles.xml.bz2 \
+        -o ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz
     ```
 3. 按字切分维基百科中文语料，用于预训练**中文字向量**和**字级别的语言模型**。
     ```bash
-    python preprocessing.py segment-wiki --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt --char-level=True
+    python preprocessing.py segment-wiki \
+        --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz \
+        --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt \
+        --char-level=True
     ```
 4. 按词切分，用于预训练**词级别的N-gram LM**。
     ```bash
-    python preprocessing.py segment-wiki --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.word.txt
+    python preprocessing.py segment-wiki \
+        --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz \
+        --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.word.txt
     ```
 5. 应用BPE切分，用于预训练**中文BPE token的嵌入表示**。
     1. `training/one_script_to_run_all.sh`训练BPE级别的校对模型时会生成BPE模型，位于`training/models/zh_bpe_model_${fusion_mode}_${how_to_remove}/train.bpe.model`。
@@ -73,36 +80,55 @@
     2. 如前所述，预处理维基百科中文语料，将其切分为字和BPE级别。
     3. 字向量训练命令为：
         ```bash
-        ./word2vec -train ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.char.word2vec.skipgram.ns.500d.txt -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -threads 10 -iter 5 -binary 0 -cbow 0
+        ./word2vec -train ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt \
+            -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.char.word2vec.skipgram.ns.500d.txt \
+            -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -threads 10 -iter 5 -binary 0 -cbow 0
         ```
     4. BPE向量训练命令为：
          ```bash
-        ./word2vec -train ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.bpe.txt -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.word2vec.skipgram.ns.500d.txt -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -threads 10 -iter 5 -binary 0 -cbow 0
+        ./word2vec -train ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.bpe.txt \
+            -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.word2vec.skipgram.ns.500d.txt \
+            -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -threads 10 -iter 5 -binary 0 -cbow 0
         ```
 2. 基于wang2vec训练字和BPE的嵌入表示
     1. 训练字和BPE表示的命令除了训练语料与结果向量存储文件不同，其余完全相同。
     2. 字向量训练命令为：
         ```bash
-        ./word2vec -train ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.char.structured.skipngram.500d.txt -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -nce 0 -threads 10 -iter 5 -binary 0 -type 3 -cap 0
+        ./word2vec -train ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt \
+            -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.char.structured.skipngram.500d.txt \
+            -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -nce 0 -threads 10 -iter 5 -binary 0 -type 3 -cap 0
         ```
     3. BPE向量训练命令为：
         ```bash
-        ./word2vec -train ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.bpe.txt -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.structured.skipngram.500d.txt -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -nce 0 -threads 10 -iter 5 -binary 0 -type 3 -cap 0
+        ./word2vec -train ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.bpe.txt \
+            -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.structured.skipngram.500d.txt \
+            -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -nce 0 -threads 10 -iter 5 -binary 0 -type 3 -cap 0
         ```
 3. 基于cw2vec训练字和BPE的嵌入表示
     1. 基于cw2vec训练字和BPE表示的命令除了训练语料、结果向量存储文件和**笔画n-gram最大长度**不同，其余完全相同。
     2. 字向量训练命令为：
         ```bash
-        ./word2vec substoke -input ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt -infeature ${cw2vec_project}/Simplified_Chinese_Feature/sin_chinese_feature.txt -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt -lr 0.025 -dim 500 -ws 10 -epoch 5 -minCount 10 -neg 10 -loss ns -minn 3 -maxn 6 -thread 10 -t 1e-4 -lrUpdateRate 100
+        ./word2vec substoke -input ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt \
+            -infeature ${cw2vec_project}/Simplified_Chinese_Feature/sin_chinese_feature.txt \
+            -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt \
+            -lr 0.025 -dim 500 -ws 10 -epoch 5 -minCount 10 -neg 10 -loss ns \
+            -minn 3 -maxn 6 -thread 10 -t 1e-4 -lrUpdateRate 100
         ```
     3. BPE向量训练命令为：
         ```bash
-        ./word2vec substoke -input ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.bpe.txt -infeature ${cw2vec_project}/Simplified_Chinese_Feature/sin_chinese_feature.txt -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.cw2vec.500d.txt -lr 0.025 -dim 500 -ws 10 -epoch 5 -minCount 10 -neg 10 -loss ns -minn 3 -maxn 9 -thread 10 -t 1e-4 -lrUpdateRate 100
+        ./word2vec substoke -input ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.bpe.txt \
+            -infeature ${cw2vec_project}/Simplified_Chinese_Feature/sin_chinese_feature.txt \
+            -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.cw2vec.500d.txt \
+            -lr 0.025 -dim 500 -ws 10 -epoch 5 -minCount 10 -neg 10 -loss ns \
+            -minn 3 -maxn 9 -thread 10 -t 1e-4 -lrUpdateRate 100
         ```
 ### 训练单模型
 进入`training/`目录，运行`one_script_to_run_all.sh`：
 ```
-./one_script_to_run_all.sh <model_arch> <model_level> <which_pretrained_embed> <fusion_mode> <short> <long> <low> <high> <src_vocab_size> <trg_vocab_size> <GPU_used_training> <GPU_used_inference> <MAX_TOKENS> <MAX_SENS> <random_seed> <want_ensemble> <force_redo_remove_same_and_seg>
+./one_script_to_run_all.sh <model_arch> <model_level> <which_pretrained_embed> <fusion_mode> \
+    <short> <long> <low> <high> \
+    <src_vocab_size> <trg_vocab_size> <GPU_used_training> <GPU_used_inference> \
+    <MAX_TOKENS> <MAX_SENS> <random_seed> <want_ensemble> <force_redo_remove_same_and_seg>
 ```
 - `<model_arch>`：支持三种seq2seq模型，lstm即LSTM seq2seq模型，fconv即ConvS2S模型，transformer即Transformer模型。
 - `<model_level>`：支持三种建模级别，word即词级别建模，bpe即BPE级别，char即字级别。
@@ -126,10 +152,19 @@
 - `<want_ensemble>`：是否基于各检出点进行集成解码。由于最初几轮迭代模型还不够好，这种集成方式性能可能会掉，故一般设置为false。
 - `<force_redo_remove_same_and_seg>`：如果预处理流程有变，则设为true，否则设为false，可以节省时间。
 ### 数据清洗实验
-### Training a Single Model
-Go to `training/` directory and use `one_script_to_run_all.sh` to train the model by specifying model architecture, model level, which pre-trained embeddings to use and data fusion mode.
-### Data Cleaning Experiments
-Go to `training/` directory and use `tune_long_low_high.sh` to determine filtering thresholds including `long`, `low` and `high` parameters.
+1. 进入`training/`目录，运行`tune_long_low_high.sh`：
+```
+./tune_long_low_high.sh <model_arch> <model_level> <which_pretrained_embed> <fusion_mode> \
+    <params_file> <src_vocab_size> <trg_vocab_size> <GPU_used_training> <GPU_used_inference> \
+    <MAX_TOKENS> <MAX_SENS> <random_seed> <want_ensemble> <force_redo_remove_same_and_seg>
+```
+- `<params_file>`：存放`short`、`long`、`low`和`high`取值的文件。
+每一行都包括四个字段，分别为`short`、`long`、`low`和`high`的取值，字段分隔符可以为","、"\t"或者" "。
+`training/all_params_to_try_short_long_low_high`存储了本文"remove-long"、"remove-low"和"remove-high"三个实验所搜索的参数值。
+- 其他参数同`one_script_to_run_all.sh`。
+2. 本文进行的数据清洗实验表明：
+- "remove-long"和"remove-high"未能提升性能。
+- "remove-low"的最佳过滤阈值为`low`=0.1，基准测试集的性能获得了有效提升。 
 
 
 ## 基于集成解码和重排序的中文文本自动校对
@@ -150,6 +185,6 @@ Reproduce experiments of chapter 6 of my master's dissertation with `training/al
 
 ## 致谢
 - [nusnlp/mlconvgec2018](https://github.com/nusnlp/mlconvgec2018)
-- [blcu-nlp/NLPCC_2018_TASK2_GEC](https://github.com/blcu-nlp/NLPCC_2018_TASK2_GEC)
 - [pytorch/fairseq](https://github.com/pytorch/fairseq)
+- [blcu-nlp/NLPCC_2018_TASK2_GEC](https://github.com/blcu-nlp/NLPCC_2018_TASK2_GEC)
 
