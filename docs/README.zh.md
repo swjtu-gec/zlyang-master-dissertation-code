@@ -47,15 +47,16 @@
 1. 下载 [wiki-zh](https://dumps.wikimedia.org/zhwiki/latest/zhwiki-latest-pages-articles.xml.bz2) 中文维基百科语料，用于预训练词向量和统计N-gram语言模型。
 2. 使用 [gensim工具包](https://github.com/RaRe-Technologies/gensim) 的`gensim.scripts.segment_wiki`模块将中文维基百科语料从XML格式转为json格式（wiki.json.gz）：
     ```bash
+    year=2018 && month=11 && day=14
     python -m gensim.scripts.segment_wiki -i -f ${PROJECT_ROOT}/data/lm-emb-traindata/zhwiki-latest-pages-articles.xml.bz2 -o ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz
     ```
 3. 按字切分维基百科中文语料，用于预训练**中文字向量**和**字级别的语言模型**。
     ```bash
-    python preprocessing.py segment_wiki --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt --char-level=True
+    python preprocessing.py segment-wiki --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt --char-level=True
     ```
 4. 按词切分，用于预训练**词级别的N-gram LM**。
     ```bash
-    python preprocessing.py segment_wiki --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.word.txt
+    python preprocessing.py segment-wiki --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.word.txt
     ```
 5. 应用BPE切分，用于预训练**中文BPE token的嵌入表示**。
     1. `training/one_script_to_run_all.sh`训练BPE级别的校对模型时会生成BPE模型，位于`training/models/zh_bpe_model_${fusion_mode}_${how_to_remove}/train.bpe.model`。
