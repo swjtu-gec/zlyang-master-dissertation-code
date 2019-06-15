@@ -49,15 +49,15 @@
     ```bash
     python -m gensim.scripts.segment_wiki -i -f ${PROJECT_ROOT}/data/lm-emb-traindata/zhwiki-latest-pages-articles.xml.bz2 -o ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz
     ```
-3. 按字切分维基百科中文语料，用于预训练中文字向量和字级别的语言模型。
+3. 按字切分维基百科中文语料，用于预训练**中文字向量**和**字级别的语言模型**。
     ```bash
     python preprocessing.py segment_wiki --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt --char-level=True
     ```
-4. 按词切分，用于预训练词级别的N-gram LM。
+4. 按词切分，用于预训练**词级别的N-gram LM**。
     ```bash
     python preprocessing.py segment_wiki --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.word.txt
     ```
-5. 应用BPE切分，用于预训练中文BPE token的嵌入表示。
+5. 应用BPE切分，用于预训练**中文BPE token的嵌入表示**。
     1. `training/one_script_to_run_all.sh`训练BPE级别的校对模型时会生成BPE模型，位于`training/models/zh_bpe_model_${fusion_mode}_${how_to_remove}/train.bpe.model`。
     2. 将中文维基语料按词切分，命令如上所示。
     3. 应用子词切分，将词序列转为BPE序列。
@@ -90,7 +90,7 @@
         ./word2vec -train ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.bpe.txt -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.structured.skipngram.500d.txt -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -nce 0 -threads 10 -iter 5 -binary 0 -type 3 -cap 0
         ```
 3. 基于cw2vec训练字和BPE的嵌入表示
-    1. 基于cw2vec训练字和BPE表示的命令除了训练语料、结果向量存储文件和笔画n-gram最大长度不同，其余完全相同。
+    1. 基于cw2vec训练字和BPE表示的命令除了训练语料、结果向量存储文件和**笔画n-gram最大长度**不同，其余完全相同。
     2. 字向量训练命令为：
         ```bash
         ./word2vec substoke -input ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt -infeature ${cw2vec_project}/Simplified_Chinese_Feature/sin_chinese_feature.txt -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.char.cw2vec.500d.txt -lr 0.025 -dim 500 -ws 10 -epoch 5 -minCount 10 -neg 10 -loss ns -minn 3 -maxn 6 -thread 10 -t 1e-4 -lrUpdateRate 100
