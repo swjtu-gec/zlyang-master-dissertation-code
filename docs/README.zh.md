@@ -153,15 +153,15 @@
 - `<force_redo_remove_same_and_seg>`：如果预处理流程有变，则设为true，否则设为false，可以节省时间。
 ### 数据清洗实验
 1. 进入`training/`目录，运行`tune_long_low_high.sh`：
-```
-./tune_long_low_high.sh <model_arch> <model_level> <which_pretrained_embed> <fusion_mode> \
-    <params_file> <src_vocab_size> <trg_vocab_size> <GPU_used_training> <GPU_used_inference> \
-    <MAX_TOKENS> <MAX_SENS> <random_seed> <want_ensemble> <force_redo_remove_same_and_seg>
-```
-- `<params_file>`：存放`short`、`long`、`low`和`high`取值的文件。
-每一行都包括四个字段，分别为`short`、`long`、`low`和`high`的取值，字段分隔符可以为","、"\t"或者" "。
-`training/all_params_to_try_short_long_low_high`存储了本文"remove-long"、"remove-low"和"remove-high"三个实验所搜索的参数值。
-- 其他参数同`one_script_to_run_all.sh`。
+    ```
+    ./tune_long_low_high.sh <model_arch> <model_level> <which_pretrained_embed> <fusion_mode> \
+        <params_file> <src_vocab_size> <trg_vocab_size> <GPU_used_training> <GPU_used_inference> \
+        <MAX_TOKENS> <MAX_SENS> <random_seed> <want_ensemble> <force_redo_remove_same_and_seg>
+    ```
+    - `<params_file>`：存放`short`、`long`、`low`和`high`取值的文件。
+    每一行都包括四个字段，分别为`short`、`long`、`low`和`high`的取值，字段分隔符可以为","、"\t"或者" "。
+    `training/all_params_to_try_short_long_low_high`存储了本文"remove-long"、"remove-low"和"remove-high"三个实验所搜索的参数值。
+    - 其他参数同`one_script_to_run_all.sh`。
 2. 本文进行的数据清洗实验表明：
 - "remove-long"和"remove-high"未能提升性能。
 - "remove-low"的最佳过滤阈值为`low`=0.1，基准测试集的性能获得了有效提升。 
