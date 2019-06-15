@@ -43,7 +43,7 @@
 3. HSK语料需先移除空格，再按当前的建模等级进行重切分，进入`data/`目录，执行命令`python preprocessing.py segment-src-trg --help`获取详细信息。
 4. `training/one_script_to_run_all.sh`会调用`data/preprocessing.py`自动完成HSK平行数据的预处理工作。
 ### 维基百科中文语料和数据处理
-1. 下载 [wiki-zh](https://dumps.wikimedia.org/zhwiki/latest/zhwiki-latest-pages-articles.xml.bz2) 中文维基百科语料，用于预训练词向量和统计N-gram语言模型。
+1. 下载 [wiki-zh](https://dumps.wikimedia.org/zhwiki/latest/zhwiki-latest-pages-articles.xml.bz2) 中文维基百科语料，用于训练词向量和统计N-gram语言模型。
 2. 使用 [gensim工具包](https://github.com/RaRe-Technologies/gensim) 的`gensim.scripts.segment_wiki`模块将中文维基百科语料从XML格式转为json格式（wiki.json.gz）：
     ```bash
     year=2018 && month=11 && day=14
@@ -51,14 +51,14 @@
         -i -f ${PROJECT_ROOT}/data/lm-emb-traindata/zhwiki-latest-pages-articles.xml.bz2 \
         -o ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz
     ```
-3. 按字切分维基百科中文语料，用于预训练**中文字向量**和**字级别的语言模型**。
+3. 按字切分维基百科中文语料，用于训练**中文字向量**和**字级别的语言模型**。
     ```bash
     python preprocessing.py segment-wiki \
         --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz \
         --output-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt \
         --char-level=True
     ```
-4. 按词切分，用于预训练**词级别的N-gram LM**。
+4. 按词切分，用于训练**词级别的N-gram LM**。
     ```bash
     python preprocessing.py segment-wiki \
         --input-file=${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.json.gz \
@@ -168,18 +168,27 @@
 
 
 ## 基于集成解码和重排序的中文文本自动校对
-### Training Single Models with Different Random Seeds
-Go to `training/` directory and use `tune_random_seed.sh` to train single models with different random number seeds.
-### Pre-training 5-Gram Language Models
+### 训练不同种子初始化的单模型
+进入`training/`目录，运行`tune_random_seed.sh`：
+```
+./tune_random_seed.sh <model_arch> <model_level> <which_pretrained_embed> <fusion_mode> \
+    <short> <long> <low> <high> \
+    <src_vocab_size> <trg_vocab_size> <GPU_used_training> <GPU_used_inference> \
+    <MAX_TOKENS> <MAX_SENS> <try_random_seed> <want_ensemble> <force_redo_remove_same_and_seg>
+```
+- `<try_random_seed>`：一系列随机数种子，空格分隔，例如：'1 2 3 4'。
+会遍历这些随机数种子，依次训练不同初始化的各单模型。
+- 其他参数同`one_script_to_run_all.sh`。
+### 训练5-gram语言模型
 TODO
-### Ensemble Decoding + Re-ranking Mechanism
+### 集成解码+重排序组件
 Reproduce experiments of chapter 5 of my master's dissertation with `training/rerank_experiment.sh`. The `rerank_experiment.sh` shell script trains the re-ranker calling `training/train_reranker.sh` firstly, and then applies the re-ranking mechanism via `training/run_trained_model.sh`. Go to `training/` directory and run `rerank_experiment.sh` script directly in the terminal for more details.
 
 
 ## 基于多通道融合与重排序的中文文本自动校对
-### Multi-channel Fusion Framework + Re-ranking Mechanism
+### 多通道融合与重排序架构
 Multi-channel fusion and re-ranking using `training/multi_channel_fusion_experiment.sh`. The `multi_channel_fusion_experiment.sh` bash script trains the re-ranker components calling `training/train_multi_channel_fusion_reranker.sh` firstly, and then multi-channel fusion and applies the re-ranking mechanism via `training/multi_channel_fusion.sh`. Go to `training/` directory and run `multi_channel_fusion_experiment.sh` script directly in the terminal for more details.
-### Reproduce Experiments of Chapter 6 of My Master's Dissertation
+### 复现学位论文第六章的实验
 Reproduce experiments of chapter 6 of my master's dissertation with `training/all_experiments_multi_channel_fusion.sh`.
 
 
