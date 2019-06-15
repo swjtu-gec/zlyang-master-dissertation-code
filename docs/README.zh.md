@@ -7,7 +7,6 @@
 5. [基于集成解码和重排序的中文文本自动校对](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#基于集成解码和重排序的中文文本自动校对)
 6. [基于多通道融合与重排序的中文文本自动校对](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#基于多通道融合与重排序的中文文本自动校对)
 7. [致谢](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#致谢)
-8. [License](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#License)
 
 
 ## 环境设置
@@ -150,7 +149,7 @@ Reproduce experiments of chapter 6 of my master's dissertation with `training/al
 
 
 ## 致谢
-
-
-## License
+- [nusnlp/mlconvgec2018](https://github.com/nusnlp/mlconvgec2018)
+- [blcu-nlp/NLPCC_2018_TASK2_GEC](https://github.com/blcu-nlp/NLPCC_2018_TASK2_GEC)
+- [pytorch/fairseq](https://github.com/pytorch/fairseq)
 
