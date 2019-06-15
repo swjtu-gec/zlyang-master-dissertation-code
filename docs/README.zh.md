@@ -180,7 +180,37 @@
 会遍历这些随机数种子，依次训练不同初始化的各单模型。
 - 其他参数同`one_script_to_run_all.sh`。
 ### 训练5-gram语言模型
-TODO
+1. 用途
+- 词级别的语言模型仅用于BPE级别校对模型N-best输出的重排序。
+- 字级别的LM用于字级别校对模型的重排序和多通道融合与重排序架构。
+2. 训练
+    1. 如前所述，预处理维基百科中文语料，将其切分为字和BPE级别。
+    2. 进入`KenLM`项目中，估计语言模型参数：
+        1. 字级别的模型
+        ```bash
+        bin/lmplz -o 5 -S 60% -T /tmp \
+            < ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt \
+            > ${PROJECT_ROOT}/training/models/lm/wiki_zh.char.5gram.arpa
+        ```
+        2. 词级别的模型
+        ```bash
+        bin/lmplz -o 5 -S 60% -T /tmp \
+            < ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.word.txt \
+            > ${PROJECT_ROOT}/training/models/lm/wiki_zh.word.5gram.arpa
+        ```
+    3. 进入`KenLM`项目中，将ARPA格式文件转为trie结构的二进制数据：
+        1. 字级别的模型
+        ```bash
+        bin/build_binary -T /tmp/trie -S 6G trie \
+            ${PROJECT_ROOT}/training/models/lm/wiki_zh.char.5gram.arpa \
+            ${PROJECT_ROOT}/training/models/lm/wiki_zh.char.5gram.binary.trie
+        ```
+        2. 词级别的模型
+        ```bash
+        bin/build_binary -T /tmp/trie -S 6G trie \
+            ${PROJECT_ROOT}/training/models/lm/wiki_zh.word.5gram.arpa \
+            ${PROJECT_ROOT}/training/models/lm/wiki_zh.word.5gram.binary.trie
+        ```
 ### 集成解码+重排序组件
 Reproduce experiments of chapter 5 of my master's dissertation with `training/rerank_experiment.sh`. The `rerank_experiment.sh` shell script trains the re-ranker calling `training/train_reranker.sh` firstly, and then applies the re-ranking mechanism via `training/run_trained_model.sh`. Go to `training/` directory and run `rerank_experiment.sh` script directly in the terminal for more details.
 
