@@ -105,27 +105,27 @@
 ```
 ./one_script_to_run_all.sh <model_arch> <model_level> <which_pretrained_embed> <fusion_mode> <short> <long> <low> <high> <src_vocab_size> <trg_vocab_size> <GPU_used_training> <GPU_used_inference> <MAX_TOKENS> <MAX_SENS> <random_seed> <want_ensemble> <force_redo_remove_same_and_seg>
 ```
-- `model_arch`：支持三种seq2seq模型，lstm即LSTM seq2seq模型，fconv即ConvS2S模型，transformer即Transformer模型。
-- `model_level`：支持三种建模级别，word即词级别建模，bpe即BPE级别，char即字级别。
-- `which_pretrained_embed`：支持三种预训练词向量和嵌入矩阵随机初始化：
-    1. 若`model_level` == word，则可取`random`和`wang2vec`。
-    2. 若`model_level` == bpe，则可取`blcu-wang2vec`（来自于 [BLCU-GEC-2018](https://github.com/blcu-nlp/NLPCC_2018_TASK2_GEC) 的 [Zlbnlp_data](https://pan.baidu.com/s/18JXm1KGmRu3Pe45jt2sYBQ)）、`wiki-wang2vec`（训练语料为中文维基百科语料）、`cw2vec-vec`（从笔画n-gram和词混合嵌入矩阵中直接拿到token的嵌入表示）、`cw2vec-avg`（将笔画n-gram向量平均的结果作为词向量）、`word2vec`和`random`。
-    3. 若`model_level` == char，则可取`wang2vec`（训练语料为中文维基百科语料）、`cw2vec-vec`、`cw2vec-avg`、`word2vec`和`random`。
+- `<model_arch>`：支持三种seq2seq模型，lstm即LSTM seq2seq模型，fconv即ConvS2S模型，transformer即Transformer模型。
+- `<model_level>`：支持三种建模级别，word即词级别建模，bpe即BPE级别，char即字级别。
+- `<which_pretrained_embed>`：支持三种预训练词向量和嵌入矩阵随机初始化：
+    1. 若`<model_level>` == word，则可取`random`和`wang2vec`。
+    2. 若`<model_level>` == bpe，则可取`blcu-wang2vec`（来自于 [BLCU-GEC-2018](https://github.com/blcu-nlp/NLPCC_2018_TASK2_GEC) 的 [Zlbnlp_data](https://pan.baidu.com/s/18JXm1KGmRu3Pe45jt2sYBQ)）、`wiki-wang2vec`（训练语料为中文维基百科语料）、`cw2vec-vec`（从笔画n-gram和词混合嵌入矩阵中直接拿到token的嵌入表示）、`cw2vec-avg`（将笔画n-gram向量平均的结果作为词向量）、`word2vec`和`random`。
+    3. 若`<model_level>` == char，则可取`wang2vec`（训练语料为中文维基百科语料）、`cw2vec-vec`、`cw2vec-avg`、`word2vec`和`random`。
     4. 需确保相应的预训练词向量模型存在，否则`one_script_to_run_all.sh`脚本会退出。
-- `fusion_mode`：支持三种模式，1表示仅使用NLPCC 2018 GEC训练数据，2表示NLPCC+HSK，模式3不使用。
-- `short`：源端或目标端长度小于阈值`short`的句子对会被移除，本文设置`short` = 1，即不移除任何短句。
-- `long`：源端或目标端长度大于阈值`long`的句子对会被移除，本文设置`long` >= 1000，即不移除任何长句。
-- `low`：目标端与源端长度比小于阈值`low`的句子对会被移除，本文通过“数据清洗实验”确定`low`的最佳取值为0.1。
-- `high`：目标端与源端长度比大于阈值`high`的句子对会被移除，本文设置`high` = 200.0（需为浮点数），即不移除目标端长度远大于源端的句子对。
-- `src_vocab_size`：源端词汇表规模，词级别模型设为69677，BPE级别模型设为37000，字级别模型设为6000。
-- `trg_vocab_size`：目标端词汇表规模，词级别模型设为65591，BPE级别模型设为37000，字级别模型设为6000。
-- `GPU_used_training`：本文基于单卡训练单模型，取值为GPU卡的ID。
-- `GPU_used_inference`：一般同`GPU_used_training`。
-- `MAX_TOKENS`：一个批的数据至多包含多少token。词级别的模型设为3000，字和BPE级别的模型均设为6000。
-- `MAX_SENS`：一个批的数据至多包含多少句子对，即batch size。词级别的模型设为30，字和BPE级别的模型均设为60。
-- `random_seed`：随机数种子，用于网络权重的初始化。一般可设为1。
-- `want_ensemble`：是否基于各检出点进行集成解码。由于最初几轮迭代模型还不够好，这种集成方式性能可能会掉，故一般设置为false。
-- `force_redo_remove_same_and_seg`：如果预处理流程有变，设为true，否则设为false，可以节省时间。
+- `<fusion_mode>`：支持三种模式，1表示仅使用NLPCC 2018 GEC训练数据，2表示NLPCC+HSK，模式3不使用。
+- `<short>`：源端或目标端长度小于阈值`short`的句子对会被移除，本文设置`short` = 1，即不移除任何短句。
+- `<long>`：源端或目标端长度大于阈值`long`的句子对会被移除，本文设置`long` >= 1000，即不移除任何长句。
+- `<low>`：目标端与源端长度比小于阈值`low`的句子对会被移除，本文通过“数据清洗实验”确定`low`的最佳取值为0.1。
+- `<high>`：目标端与源端长度比大于阈值`high`的句子对会被移除，本文设置`high` = 200.0（需为浮点数），即不移除目标端长度远大于源端的句子对。
+- `<src_vocab_size>`：源端词汇表规模，词级别模型设为69677，BPE级别模型设为37000，字级别模型设为6000。
+- `<trg_vocab_size>`：目标端词汇表规模，词级别模型设为65591，BPE级别模型设为37000，字级别模型设为6000。
+- `<GPU_used_training>`：本文基于单卡训练单模型，取值为GPU卡的ID。
+- `<GPU_used_inference>`：一般同`<GPU_used_training>`。
+- `<MAX_TOKENS>`：一个批的数据至多包含多少token。词级别的模型设为3000，字和BPE级别的模型均设为6000。
+- `<MAX_SENS>`：一个批的数据至多包含多少句子对，即batch size。词级别的模型设为30，字和BPE级别的模型均设为60。
+- `<random_seed>`：随机数种子，用于网络权重的初始化。一般可设为1。
+- `<want_ensemble>`：是否基于各检出点进行集成解码。由于最初几轮迭代模型还不够好，这种集成方式性能可能会掉，故一般设置为false。
+- `<force_redo_remove_same_and_seg>`：如果预处理流程有变，则设为true，否则设为false，可以节省时间。
 ### 数据清洗实验
 ### Training a Single Model
 Go to `training/` directory and use `one_script_to_run_all.sh` to train the model by specifying model architecture, model level, which pre-trained embeddings to use and data fusion mode.
