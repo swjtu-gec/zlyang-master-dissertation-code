@@ -1,12 +1,12 @@
 # 硕士学位论文：基于深度学习的中文文本自动校对研究与实现
 ## 内容
 1. 论文：[基于深度学习的中文文本自动校对研究与实现](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/基于深度学习的中文文本自动校对研究与实现.pdf)
-2. [环境设置](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#环境设置)
-3. [数据预处理](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#数据预处理)
-4. [基于卷积编解码网络的中文校对模型](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#基于卷积编解码网络的中文校对模型)
-5. [基于集成解码和重排序的中文文本自动校对](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#基于集成解码和重排序的中文文本自动校对)
-6. [基于多通道融合与重排序的中文文本自动校对](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#基于多通道融合与重排序的中文文本自动校对)
-7. [致谢](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/README.zh.md#致谢)
+2. [环境设置](#环境设置)
+3. [数据预处理](#数据预处理)
+4. [基于卷积编解码网络的中文校对模型](#基于卷积编解码网络的中文校对模型)
+5. [基于集成解码和重排序的中文文本自动校对](#基于集成解码和重排序的中文文本自动校对)
+6. [基于多通道融合与重排序的中文文本自动校对](#基于多通道融合与重排序的中文文本自动校对)
+7. [致谢](#致谢)
 
 
 ## 环境设置
