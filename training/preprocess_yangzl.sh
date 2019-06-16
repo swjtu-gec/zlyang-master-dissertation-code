@@ -21,10 +21,10 @@ bpe_operations=$7
 src_vocab_size=$8
 tgt_vocab_size=$9
 
-# path to sub-word nmt
+# path to sub-word nmt project
 SUBWORD_NMT=${SOFTWARE_DIR}/subword-nmt
+
 BPE_MODEL=train.bpe.model
-# paths to training and development datasets
 src_ext=src
 trg_ext=trg
 
