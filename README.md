@@ -66,10 +66,12 @@
     ```
 5. 应用BPE切分，用于预训练**中文BPE token的嵌入表示**。
     1. `training/one_script_to_run_all.sh`训练BPE级别的校对模型时会生成BPE模型，位于`training/models/zh_bpe_model_${fusion_mode}_${how_to_remove}/train.bpe.model`。
-    2. 将中文维基语料按词切分，命令如上所示。
+    2. 将中文维基语料按词切分，命令如前所述。
     3. 应用子词切分，将词序列转为BPE序列。
         ```bash
-        ${PROJECT_ROOT}/scripts/apply_bpe.py -c ${BPE_MODEL} < ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.word.txt > ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.bpe.txt
+        ${PROJECT_ROOT}/scripts/apply_bpe.py -c ${BPE_MODEL} \
+            < ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.word.txt \
+            > ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.bpe.txt
         ```
 
 
