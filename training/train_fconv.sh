@@ -29,7 +29,8 @@ CUDA_VISIBLE_DEVICES="${gpu_to_use}" python ${FAIRSEQPY}/train.py \
     --num-workers=4 --skip-invalid-size-inputs-valid-test \
     --encoder-embed-dim 500 \
     --decoder-embed-dim 500 --decoder-out-embed-dim 500 \
-    --dropout='0.2' --clip-norm=0.1 --lr 0.25 --min-lr 1e-4 \
+    --dropout='0.2' --clip-norm=0.1 \
+    --lr-scheduler reduce_lr_on_plateau --lr 0.25 --min-lr 1e-4 \
     --encoder-layers '[(1024,3)] * 7' --decoder-layers '[(1024,3)] * 7' \
     --momentum 0.99 --max-epoch 100 \
     --max-tokens ${MAX_TOKENS} --max-sentences ${MAX_SENS} \
