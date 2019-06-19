@@ -26,13 +26,14 @@ CUDA_VISIBLE_DEVICES="${gpu_to_use}" python ${FAIRSEQPY}/train.py \
     ${DATA_BIN_DIR} \
     --save-dir ${OUT_DIR} \
     -a lstm \
+    --num-workers=4 --skip-invalid-size-inputs-valid-test \
     --encoder-embed-dim=1000 --decoder-embed-dim=1000 \
     --encoder-hidden-size=500 --decoder-hidden-size=1000 \
     --encoder-bidirectional --encoder-layers=2 --decoder-layers=2 \
     --decoder-out-embed-dim=1000 \
-    --lr-scheduler reduce_lr_on_plateau --clip-norm 0.1 \
-    --num-workers=4 --skip-invalid-size-inputs-valid-test \
-    --max-epoch 100 \
+    --optimizer nag --momentum 0.99 \
+    --lr-scheduler=reduce_lr_on_plateau --lr=0.25 --lr-shrink=0.1 --min-lr=1e-5 \
+    --clip-norm 0.1 --max-epoch 100 \
     --max-tokens ${MAX_TOKENS} --max-sentences ${MAX_SENS} \
     --no-progress-bar --seed ${SEED}
 
