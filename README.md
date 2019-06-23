@@ -79,7 +79,7 @@
 
 ## 基于卷积编解码网络的中文校对模型
 ### 预训练不同级别的嵌入表示
-1. 基于word2vec训练字和BPE的嵌入表示
+- 基于word2vec训练字和BPE的嵌入表示
     1. 训练字和BPE表示的命令除了训练语料与结果向量存储文件不同，其余完全相同。
     2. 如前所述，预处理维基百科中文语料，将其切分为字和BPE级别。
     3. 字向量训练命令为：
@@ -94,7 +94,7 @@
             -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.word2vec.skipgram.ns.500d.txt \
             -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -threads 10 -iter 5 -binary 0 -cbow 0
         ```
-2. 基于wang2vec训练字和BPE的嵌入表示
+- 基于wang2vec训练字和BPE的嵌入表示
     1. 训练字和BPE表示的命令除了训练语料与结果向量存储文件不同，其余完全相同。
     2. 字向量训练命令为：
         ```bash
@@ -108,7 +108,7 @@
             -output ${PROJECT_ROOT}/data/embeddings/wiki.zh.jian.jieba.seg.bpe.structured.skipngram.500d.txt \
             -size 500 -window 10 -sample 1e-4 -hs 0 -negative 10 -nce 0 -threads 10 -iter 5 -binary 0 -type 3 -cap 0
         ```
-3. 基于cw2vec训练字和BPE的嵌入表示
+- 基于cw2vec训练字和BPE的嵌入表示
     1. 基于cw2vec训练字和BPE表示的命令除了训练语料、结果向量存储文件和**笔画n-gram最大长度**不同，其余完全相同。
     2. 字向量训练命令为：
         ```bash
@@ -190,26 +190,26 @@
 2. 训练
     1. 如前所述，预处理维基百科中文语料，将其切分为字和BPE级别。
     2. 进入`KenLM`项目，估计语言模型参数：
-        1. 字级别的模型
+        - 字级别的模型
             ```bash
             bin/lmplz -o 5 -S 60% -T /tmp \
                 < ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.char.seg.txt \
                 > ${PROJECT_ROOT}/training/models/lm/wiki_zh.char.5gram.arpa
             ```
-        2. 词级别的模型
+        - 词级别的模型
             ```bash
             bin/lmplz -o 5 -S 60% -T /tmp \
                 < ${PROJECT_ROOT}/data/lm-emb-traindata/wiki${year}-${month}-${day}.jieba.seg.word.txt \
                 > ${PROJECT_ROOT}/training/models/lm/wiki_zh.word.5gram.arpa
             ```
     3. 进入`KenLM`项目，将ARPA格式文件转为trie结构的二进制数据：
-        1. 字级别的模型
+        - 字级别的模型
             ```bash
             bin/build_binary -T /tmp/trie -S 6G trie \
                 ${PROJECT_ROOT}/training/models/lm/wiki_zh.char.5gram.arpa \
                 ${PROJECT_ROOT}/training/models/lm/wiki_zh.char.5gram.binary.trie
             ```
-        2. 词级别的模型
+        - 词级别的模型
             ```bash
             bin/build_binary -T /tmp/trie -S 6G trie \
                 ${PROJECT_ROOT}/training/models/lm/wiki_zh.word.5gram.arpa \
