@@ -215,8 +215,50 @@
                 ${PROJECT_ROOT}/training/models/lm/wiki_zh.word.5gram.arpa \
                 ${PROJECT_ROOT}/training/models/lm/wiki_zh.word.5gram.binary.trie
             ```
-### 集成解码+重排序组件
-Reproduce experiments of chapter 5 of my master's dissertation with `training/rerank_experiment.sh`. The `rerank_experiment.sh` shell script trains the re-ranker calling `training/train_reranker.sh` firstly, and then applies the re-ranking mechanism via `training/run_trained_model.sh`. Go to `training/` directory and run `rerank_experiment.sh` script directly in the terminal for more details.
+### 模型推断+重排序组件
+1. 训练重打分器。进入`training/`目录，运行`train_reranker.sh`：
+    ```
+    ./train_reranker.sh <dev_data_dir> <train_reranker_output_dir> <device> \
+        <model_path> <reranker_feats> <moses_path> \
+        <DATA_BIN_DIR> <BPE_MODEL_DIR> <lm_url>
+    ```
+    - `<dev_data_dir>`：验证集的源端输入（`dev.input.txt`）和m2格式的参考编辑（`dev.m2`）所在的目录，
+    为`training/`目录下的`processed_dir`，（`processed_dir`由`one_script_to_run_all.sh`自动生成）。
+    - `<train_reranker_output_dir>`：用于存放训练重打分器时生成的文件。
+    - `<device>`：指定模型推断时使用的GPU卡的ID。
+    - `<model_path>`：支持单模型推断与集成解码：
+        1. 若为单模型（`xxx.pt`）的url，则为单模型推断。
+        2. 若为目录，则使用该目录下的所有模型进行集成解码。
+    - `<reranker_feats>`：支持三种重排序方法：
+        1. `eo`：为编辑操作特征重排序。
+        2. `lm`：为语言模型特征重排序。
+        3. `eolm`：为EO特征+LM特征重排序。
+    - `<moses_path>`：[Moses](https://github.com/moses-smt/mosesdecoder) 项目的路径。
+    - `<DATA_BIN_DIR>`：`fairseq`的`preprocess.py`的输出目录，`one_script_to_run_all.sh`会自动生成，为`processed_dir/bin`。
+    - `<BPE_MODEL_DIR>`：指定BPE模型的所在目录：
+        1. 若为BPE级别的校对模型，设为`training/models/zh_bpe_model_${fusion_mode}_${how_to_remove}/`，`one_script_to_run_all.sh`会自动生成。
+        2. 若为词级别或字级别的校对模型，设为`None`即可。
+    - `<lm_url>`：指定5-gram语言模型的URL：
+        1. 若为词级别或BPE级别的校对模型，则为词级别的5-gram LM。
+        2. 若为字级别的校对模型，则为字级别的5-gram LM。
+2. 模型推断。进入`training/`目录，运行`run_trained_model.sh`：
+    ```
+    ./run_trained_model.sh <test_input> <run_models_output_dir> <device> \
+        <model_path> <DATA_BIN_DIR> <BPE_MODEL_DIR> \
+    ```
+    - `<test_input>`：NLPCC 2018 GEC基准测试集（`data/test/nlpcc2018-test/source.txt`）或其他源端输入的URL。
+    - `<run_models_output_dir>`：用于存放模型推断时生成的文件。
+    - 其他参数同`train_reranker.sh`。
+3. 模型推断+应用重排序机制。进入`training/`目录，运行`run_trained_model.sh`：
+    ```
+    ./run_trained_model.sh <test_input> <run_models_output_dir> <device> \
+        <model_path> <DATA_BIN_DIR> <BPE_MODEL_DIR> \
+        <reranker_weights> <reranker_feats> <lm_url>
+    ```
+    - `<reranker_weights>`：存放特征权重的文件，为`<train_reranker_output_dir>/weights.${reranker_feats}.txt`。
+    - 其他参数同`train_reranker.sh`和`run_trained_model.sh`。
+4. 调用`training/rerank_experiment.sh`，可一步到位完成：重打分器的训练 => 模型推断+重排序 => 基于基准测试集计算校对系统的标准性能指标。
+但需要修改一些变量的取值。
 
 
 ## 基于多通道融合与重排序的中文文本自动校对
