@@ -6,7 +6,9 @@
 4. [基于卷积编解码网络的中文校对模型](#基于卷积编解码网络的中文校对模型)
 5. [基于集成解码和重排序的中文文本自动校对](#基于集成解码和重排序的中文文本自动校对)
 6. [基于多通道融合与重排序的中文文本自动校对](#基于多通道融合与重排序的中文文本自动校对)
-7. [致谢](#致谢)
+7. [引用](#引用)
+8. [License](#License)
+9. [致谢](#致谢)
 
 
 ## 环境设置
@@ -222,6 +224,16 @@ Reproduce experiments of chapter 5 of my master's dissertation with `training/re
 Multi-channel fusion and re-ranking using `training/multi_channel_fusion_experiment.sh`. The `multi_channel_fusion_experiment.sh` bash script trains the re-ranker components calling `training/train_multi_channel_fusion_reranker.sh` firstly, and then multi-channel fusion and applies the re-ranking mechanism via `training/multi_channel_fusion.sh`. Go to `training/` directory and run `multi_channel_fusion_experiment.sh` script directly in the terminal for more details.
 ### 复现学位论文第六章的实验
 Reproduce experiments of chapter 6 of my master's dissertation with `training/all_experiments_multi_channel_fusion.sh`.
+
+
+## 引用
+```
+杨宗霖. 基于深度学习的中文文本自动校对研究与实现[D]. 西南交通大学, 2019.
+```
+
+
+## License
+与 [nusnlp/mlconvgec2018](https://github.com/nusnlp/mlconvgec2018) 一致，均为GPL-3.0。
 
 
 ## 致谢
