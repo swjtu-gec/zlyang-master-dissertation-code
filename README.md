@@ -1,6 +1,6 @@
 # 硕士学位论文：基于深度学习的中文文本自动校对研究与实现
 ## 内容
-1. 论文：[基于深度学习的中文文本自动校对研究与实现](https://github.com/young-zonglin/zlyang-master-thesis-codes/blob/master/docs/基于深度学习的中文文本自动校对研究与实现.pdf)
+1. 论文：[基于深度学习的中文文本自动校对研究与实现](https://github.com/swjtu-gec/zlyang-master-dissertation-code/tree/master/docs)
 2. [环境设置](#环境设置)
 3. [数据预处理](#数据预处理)
 4. [基于卷积编解码网络的中文校对模型](#基于卷积编解码网络的中文校对模型)
@@ -12,7 +12,7 @@
 
 
 ## 环境设置
-1. 克隆本项目：`git clone https://github.com/young-zonglin/zlyang-master-thesis-codes.git`
+1. 克隆本项目：`git clone https://github.com/swjtu-gec/zlyang-master-dissertation-code.git`
 2. 安装所需依赖：
     * [Anaconda3-4.4.0-Linux-x86_64（Python 3.6.1）](https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh)
     * [fairseq-py-extended](https://github.com/young-zonglin/fairseq-extended.git)：这是本文`fork`的`fairseq-py`，也是本项目所使用的具体版本（`fairseq 0.6.0`）。编译安装完成后，还需修改`path.sh`中的`FAIRSEQPY`，使其指向fairseq项目目录。
