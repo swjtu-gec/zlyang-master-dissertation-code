@@ -86,7 +86,7 @@ ${multi_channel_fusion_sh} ${char_dev_data_dir}/dev.input.txt ${output_dir} ${de
 merged_file=${rerank_dir}/output.${channel_output_mode}.char.reformat.merged
 less ${output_dir}/nmt-score/output.${channel_output_mode}.char.reformat.merged > ${merged_file}
 
-# augmenting the dev nbest
+# augmenting the dev merged nbest
 ${NBEST_RERANKER}/augmenter.py \
     -s ${char_dev_data_dir}/dev.input.txt \
     -i ${merged_file} \
