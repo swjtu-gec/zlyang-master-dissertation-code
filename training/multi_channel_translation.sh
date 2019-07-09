@@ -60,7 +60,7 @@ if [[ -d "$char_model_path" ]]; then
 elif [[ -f "$char_model_path" ]]; then
     char_models=${char_model_path}
 elif [[ ! -e "$char_model_path" ]]; then
-    echo "char level model(s) path not found in $char_model_path"
+    echo "char level model(s) not found in $char_model_path"
     exit -3
 fi
 
@@ -72,7 +72,7 @@ if [[ -d "$bpe_model_path" ]]; then
 elif [[ -f "$bpe_model_path" ]]; then
     bpe_models=${bpe_model_path}
 elif [[ ! -e "$bpe_model_path" ]]; then
-    echo "bpe level model(s) path not found in $bpe_model_path"
+    echo "bpe level model(s) not found in $bpe_model_path"
     exit -4
 fi
 
