@@ -263,9 +263,13 @@
 
 ## 基于多通道融合与重排序的中文文本自动校对
 ### 多通道融合与重排序架构
-Multi-channel fusion and re-ranking using `training/multi_channel_fusion_experiment.sh`. The `multi_channel_fusion_experiment.sh` bash script trains the re-ranker components calling `training/train_multi_channel_fusion_reranker.sh` firstly, and then multi-channel fusion and applies the re-ranking mechanism via `training/multi_channel_fusion.sh`. Go to `training/` directory and run `multi_channel_fusion_experiment.sh` script directly in the terminal for more details.
+- Multi-channel fusion and re-ranking using `training/multi_channel_fusion_experiment.sh`.
+- The `multi_channel_fusion_experiment.sh` bash script trains the re-ranker components calling `training/train_multi_channel_fusion_reranker.sh` firstly, and then multi-channel fusion and applies the re-ranking mechanism via `training/multi_channel_fusion.sh`.
+- Go to `training/` directory and run `multi_channel_fusion_experiment.sh` script directly in the terminal for more details.
+- **NOTE**: You may need to modify the values of some variables in `multi_channel_fusion_experiment.sh`.
+- **TODO**: 这部分的readme不大好写，就照着`multi_channel_fusion_experiment.sh`修改吧...
 ### 复现学位论文第六章的实验
-Reproduce experiments of chapter 6 of my master's dissertation with `training/all_experiments_multi_channel_fusion.sh`.
+Reproduce experiments of chapter 6th of my master's dissertation with `training/all_experiments_multi_channel_fusion.sh`.
 
 
 ## 引用
