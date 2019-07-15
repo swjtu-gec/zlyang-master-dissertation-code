@@ -244,7 +244,7 @@
 2. 模型推断。进入`training/`目录，运行`run_trained_model.sh`：
     ```
     ./run_trained_model.sh <test_input> <run_models_output_dir> <device> \
-        <model_path> <DATA_BIN_DIR> <BPE_MODEL_DIR> \
+        <model_path> <DATA_BIN_DIR> <BPE_MODEL_DIR>
     ```
     - `<test_input>`：NLPCC 2018 GEC基准测试集（`data/test/nlpcc2018-test/source.txt`）或其他源端输入的URL。
     - `<run_models_output_dir>`：用于存放模型推断时生成的文件。
